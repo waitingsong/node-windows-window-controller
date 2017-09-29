@@ -1,7 +1,7 @@
 {
   "name": "windows-window-controller",
   "version": "1.0.0",
-  "description": "controller window by calling user32.ShowWindow from node via node-ffi",
+  "description": "controll window by calling user32.ShowWindow from node via node-ffi",
   "main": "./dist/index.js",
   "bin": {
     "nwwc": "./dist/bin/nwwc.js",
@@ -19,6 +19,8 @@
     "ShowWindow",
     "show window",
     "hide window",
+    "maximize window",
+    "minimize window",
     "隐藏窗口"
   ],
   "module": "./dist/index.js",
