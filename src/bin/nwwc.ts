@@ -1,3 +1,8 @@
+/**
+ * arguments: 
+ * --hwnd={integer} --status={nCmdShow}
+ */
+
 import showWindow, {validate_cmdshow} from '../index';
 
 const [,, ...argv] = process.argv;

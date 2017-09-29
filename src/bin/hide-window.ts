@@ -1,3 +1,9 @@
+/**
+ * arguments: 
+ * --pid={integer}
+ * --title={string}
+ */
+
 import * as nwwc from '../index';
 
 const [,, ...argv] = process.argv;
