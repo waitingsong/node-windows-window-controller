@@ -36,4 +36,4 @@ if ( ! param) {
 }
 
 
-nwwc.hide(param).then(() => process.exit());
+nwwc.hide(param).then(() => process.exit(0));

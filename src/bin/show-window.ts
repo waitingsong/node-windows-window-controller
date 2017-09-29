@@ -50,4 +50,4 @@ if ( ! nwwc.validate_cmdshow(status)) {
     process.exit(1);
 }
 
-nwwc.show(param, status).then(() => process.exit());
+nwwc.show(param, status).then(() => process.exit(0));
