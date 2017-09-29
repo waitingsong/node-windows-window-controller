@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * arguments: 
  * --hwnd={integer} --status={nCmdShow}
