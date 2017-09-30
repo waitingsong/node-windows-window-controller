@@ -66,6 +66,7 @@ export interface Api {
     IsWindowVisible(hWnd: number): boolean;
     ShowWindow(hWnd: number, nCmdShow: number): boolean;
     GetParent(hWnd: number): number | null;
+    GetAncestor(hwnd: number, gaFlags: number): number;
 }
 export interface EnumWindows {
     (lpEnumFunc: Buffer, lParam: number): boolean;
@@ -79,10 +80,12 @@ const api: Api = ffi.Library('user32.dll', {
     IsWindowVisible: ['bool', ['int32'] ],
     ShowWindow: ['bool', ['uint32', 'int'] ],
     GetParent: ['uint32', ['uint32']],
+    GetAncestor: ['uint', ['uint32', 'uint']],
 });
 
 const HWNDSet: Set<number> = new Set(); // dec[]
 let hexProcId: string = ''; // hex
+let decProcId: number = 0;
 let matchTitle: string = '';
 let processing = false;
 
@@ -233,6 +236,7 @@ export function get_main_hwnd(p: matchParam): Promise<number | void> {
 }
 
 function _get_hwnd(p: matchParam): Promise<number[] | void> {
+
     if (processing) {
         return new Promise((resolve) => {
             setTimeout((p) => {
@@ -249,6 +253,7 @@ function _get_hwnd(p: matchParam): Promise<number[] | void> {
             return Promise.resolve();
         }
 
+        decProcId = p;
         hexProcId = p.toString(16);
         matchTitle = '';
         return get_hwnd_by_pid(p)
@@ -263,6 +268,7 @@ function _get_hwnd(p: matchParam): Promise<number[] | void> {
             });
     }
     else if (typeof p === 'string') {
+        decProcId = 0;
         hexProcId = '';
         matchTitle = p;
         return get_hwnd_by_keyword()
@@ -314,21 +320,36 @@ function get_hwnd_by_keyword(): Promise<number[]> {
 	});
 }
 
+// get hWnd of main top-level window
 function filter_main_hwnd(arr: number[]): number | void {
     const res = new Set();
+    const map = new Map();
 
     for (let hWnd of arr) {
-        if (is_main_window(hWnd)) {
-            res.add(hWnd);
-        }
+        const ownerHWnd = api.GetAncestor(hWnd, 3);
+        let count = map.get(ownerHWnd);
+
+        count = ! count ? 1 : count + 1;
+        map.set(ownerHWnd, count);
     }
-    if (res.size === 1) {
-        const [hWnd] = res.keys();
+
+    if (map.size === 1) {
+        const [hWnd] = map.keys();
 
         return hWnd;
     }
-    else if (res.size > 1) {
-        return Math.min(...res.keys());
+    else if (map.size > 1) {
+        let max = 0;
+        let hWnd = 0;
+
+        for (let [k, v] of map) {
+            if (v > max) {
+                max = v;
+                hWnd = k;
+            }
+        }
+
+        return hWnd;
     }
 }
 
@@ -343,17 +364,7 @@ function is_main_window(hWnd: number): boolean {
 const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, lParam: number): boolean => {
     let pid = 0;
 
-    if (typeof lParam === 'number') {
-        pid = lParam;
-    }
-    else if (typeof lParam === 'string') {
-        pid = 0;
-    }
-    else {
-        return false;   // stop enumeration
-    }
-
-    if (pid > 0) {
+    if (decProcId > 0) {
         const buf = Buffer.alloc(8);
 
         api.GetWindowThreadProcessId(hWnd, buf);
