@@ -69,8 +69,8 @@ export interface Api {
     GetAncestor(hwnd: number, gaFlags: number): number;
 }
 export interface EnumWindows {
-    (lpEnumFunc: Buffer, lParam: number): boolean;
-    async(lpEnumFunc: Buffer, lParam: number, cb: (err: Error) => void): boolean;
+    (lpEnumFunc: Buffer, lParam: Tno): boolean;
+    async(lpEnumFunc: Buffer, lParam: Tno, cb: (err: Error) => void): boolean;
 }
 
 const api: Api = ffi.Library('user32.dll', {
