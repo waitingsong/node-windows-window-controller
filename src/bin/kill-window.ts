@@ -2,17 +2,17 @@
 
 /**
  * kill process by which the matched hWnd(s) (window) created
- * optins: 
+ * optins:
  * --pid={number}
  * --title={string}
  */
 
 import * as nwwc from '../index';
 
-const [,, ...argv] = process.argv;
+const [, , ...argv] = process.argv;
 let param: string | number = 0;
 
-if ( ! argv || ! argv.length) {
+if (!argv || !argv.length) {
     console.error('argv empty. options: --title or --pid');
     process.exit(1);
 }
@@ -27,7 +27,7 @@ for (let v of argv) {
         }
     }
 }
-if ( ! param) {
+if (!param) {
     for (let v of argv) {
         if (v.indexOf('--title') === 0) {
             const {[1]: title} = v.split('=');
@@ -40,7 +40,7 @@ if ( ! param) {
     }
 }
 
-if ( ! param) {
+if (!param) {
     process.exit(1);
 }
 
