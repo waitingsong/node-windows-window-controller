@@ -107,6 +107,49 @@ const config: Config = {
 
 export type ErrCode = number; // 0: no error
 
+
+// stop loop if return false
+const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, lParam: Tno): boolean => {
+    const task = config.task.get(lParam);
+
+    if ( ! task) {
+        return true;
+    }
+
+    if (task.pid > 0) {
+        const buf = Buffer.alloc(8);
+
+        api.GetWindowThreadProcessId(hWnd, buf);
+        const pid = buf.readUIntLE(0, 8);
+
+        if (pid && pid === task.pid) {
+            task.hwndSet.add(hWnd);
+        }
+    }
+    else {
+        if (task.title) {
+            const buf = Buffer.alloc(254);
+            const ret = api.GetWindowTextW(hWnd, buf, 254);
+            const name = buf.toString('ucs2');
+            // const visible = api.IsWindowVisible(hWnd);
+
+            if (name.indexOf(task.title) !== -1) {
+                const buf = Buffer.alloc(8);
+
+                api.GetWindowThreadProcessId(hWnd, buf);
+                task.pidSet.add(buf.readUIntLE(0, 8));
+                task.hwndSet.add(hWnd);
+                // console.log(`${hWnd}: ${name}`);
+            }
+        }
+        else {  // all
+            task.hwndSet.add(hWnd);
+        }
+    }
+    return true;
+});
+
+
 // expose original user32.ShowWindow() as default
 export default function showWindow(hWnd: number, nCmdShow: CmdShow): ErrCode {
     let errcode = 1;
@@ -353,47 +396,6 @@ function is_main_window(hWnd: number): boolean {
     return res === null || res === 0 ? true : false;
 }
 
-
-// 返回false终止迭代
-const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, lParam: Tno): boolean => {
-    const task = config.task.get(lParam);
-
-    if ( ! task) {
-        return true;
-    }
-
-    if (task.pid > 0) {
-        const buf = Buffer.alloc(8);
-
-        api.GetWindowThreadProcessId(hWnd, buf);
-        const pid = buf.readUIntLE(0, 8);
-
-        if (pid && pid === task.pid) {
-            task.hwndSet.add(hWnd);
-        }
-    }
-    else {
-        if (task.title) {
-            const buf = Buffer.alloc(254);
-            const ret = api.GetWindowTextW(hWnd, buf, 254);
-            const name = buf.toString('ucs2');
-            // const visible = api.IsWindowVisible(hWnd);
-
-            if (name.indexOf(task.title) !== -1) {
-                const buf = Buffer.alloc(8);
-
-                api.GetWindowThreadProcessId(hWnd, buf);
-                task.pidSet.add(buf.readUIntLE(0, 8));
-                task.hwndSet.add(hWnd);
-                // console.log(`${hWnd}: ${name}`);
-            }
-        }
-        else {  // all
-            task.hwndSet.add(hWnd);
-        }
-    }
-    return true;
-});
 
 // kill process by which the matched hWnd(s) (window) created
 export function kill(p: matchParam): Promise<void> {
