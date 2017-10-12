@@ -86,11 +86,12 @@ const api: Api = ffi.Library('user32.dll', {
 
 type Tno = number;
 type Pid = number;
+type Hwnd = number;
 interface Task {
     readonly tno: Tno;
     pid: Pid;       // match pid
     title: string;  // match title
-    hwndSet: Set<Pid>; // result dec[]
+    hwndSet: Set<Hwnd>; // result dec[]
     pidSet: Set<Pid>;   // result dec[]
 }
 interface Config {
