@@ -89,6 +89,8 @@ let decProcId: number = 0;
 let matchTitle: string = '';
 let processing = false;
 
+const killProcIdSet: Set<number> = new Set(); // dec[]
+
 export type ErrCode = number; // 0: no error
 
 // expose original user32.ShowWindow() as default
@@ -383,6 +385,10 @@ const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, l
             name = buf.toString('ucs2');
             // visible = api.IsWindowVisible(hWnd);
             if (name.indexOf(matchTitle) !== -1) {
+                const buf = Buffer.alloc(8);
+
+                api.GetWindowThreadProcessId(hWnd, buf);
+                killProcIdSet.add(buf.readUIntLE(0, 8));
                 HWNDSet.add(hWnd);
                 // console.log(`${hWnd}: ${name}`);
             }
@@ -393,3 +399,22 @@ const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, l
     }
     return true;
 });
+
+export function kill(p: matchParam): Promise<void> {
+    return new Promise((resolve) => {
+        get_main_hwnd(p).then(hWnd => {
+            if (killProcIdSet.size) {
+                try {
+                    for (let pid of killProcIdSet) {
+                        process.kill(pid, 0) && process.kill(pid);
+                        console.log(`killed pid: ${pid}`);
+                    }
+                }
+                catch(ex) {
+                    console.error(ex);
+                }
+                resolve();
+            }
+        });
+    });
+}
