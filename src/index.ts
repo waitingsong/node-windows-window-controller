@@ -84,9 +84,9 @@ const api: Api = ffi.Library('user32.dll', {
 });
 
 
-type Tno = number;
-type Pid = number;
-type Hwnd = number;
+export type Tno = number;
+export type Pid = number;
+export type Hwnd = number;
 interface Task {
     readonly tno: Tno;
     pid: Pid;       // match pid
