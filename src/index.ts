@@ -83,12 +83,26 @@ const api: Api = ffi.Library('user32.dll', {
     GetAncestor: ['uint', ['uint32', 'uint']],
 });
 
-const HWNDSet: Set<number> = new Set(); // dec[]
-let decProcId: number = 0;
-let matchTitle: string = '';
-let processing = false;
 
-const killProcIdSet: Set<number> = new Set(); // dec[]
+type Tno = number;
+type Pid = number;
+interface Task {
+    readonly tno: Tno;
+    pid: Pid;       // match pid
+    title: string;  // match title
+    hwndSet: Set<Pid>; // result dec[]
+    pidSet: Set<Pid>;   // result dec[]
+}
+interface Config {
+    tno: Tno;
+    task: Map<Tno, Task>;
+}
+
+const config: Config = {
+    tno: 0,
+    task: new Map(),
+};
+
 
 export type ErrCode = number; // 0: no error
 
@@ -204,8 +218,23 @@ function _show(hWnd: number, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<v
     });
 }
 
+export function get_main_hwnd(p: matchParam): Promise<number | void> {
+    return get_hwnds(p).then(arr => {
+        if (arr && Array.isArray(arr) && arr.length) {
+            return filter_main_hwnd(arr);
+        }
+    });
+}
+
 
 export function get_hwnds(p: matchParam): Promise<number[] | void> {
+    return _get_hwnds(p);
+}
+
+function _get_hwnds(p: matchParam, task?: Task): Promise<number[] | void> {
+    if ( ! task) {
+        task = create_task();
+    }
     let t;
 
     return Promise.race([
@@ -215,67 +244,45 @@ export function get_hwnds(p: matchParam): Promise<number[] | void> {
                 resolve();
             }, 30000); // @HARDCOD
         }),
-        _get_hwnd(p),
+        _get_hwnd(p, task),
     ]).then(res => {
         clearTimeout(t);
+        task && config.task.delete(task.tno);
         if (res && Array.isArray(res) && res.length) {
             return res;
         }
     }).catch(err => {
         clearTimeout(t);
-        processing = false;
+        task && config.task.delete(task.tno);
         console.error(err);
     });
 }
 
-export function get_main_hwnd(p: matchParam): Promise<number | void> {
-    return get_hwnds(p).then(arr => {
-        if (arr && Array.isArray(arr) && arr.length) {
-            return filter_main_hwnd(arr);
-        }
-    });
-}
-
-function _get_hwnd(p: matchParam): Promise<number[] | void> {
-    if (processing) {
-        return new Promise((resolve) => {
-            setTimeout((p) => {
-                // console.log('delay');
-                resolve(_get_hwnd(p));
-            }, 30, p);
-        });
-    }
-    else {
-        processing = true;
-    }
+function _get_hwnd(p: matchParam, task: Task): Promise<number[] | void> {
     if (typeof p === 'number') {
         if ( ! Number.isSafeInteger(p)) {
             return Promise.resolve();
         }
 
-        decProcId = p;
-        matchTitle = '';
-        return get_hwnd_by_pid(p)
+        task.pid = p;
+        task.title = '';
+        return get_hwnd(task)
             .then(res => {
-                processing = false;
                 return res;
             })
             .catch(err => {
-                processing = false;
                 console.error(err);
                 return;
             });
     }
     else if (typeof p === 'string') {
-        decProcId = 0;
-        matchTitle = p;
-        return get_hwnd_by_keyword()
+        task.pid = 0;
+        task.title = p;
+        return get_hwnd(task)
             .then(res => {
-                processing = false;
                 return res;
             })
             .catch(err => {
-                processing = false;
                 console.error(err);
                 return;
             });
@@ -286,37 +293,24 @@ function _get_hwnd(p: matchParam): Promise<number[] | void> {
     }
 }
 
-function get_hwnd_by_pid(pid: number): Promise<number[]> {
+
+function get_hwnd(task: Task): Promise<number[]> {
 	return new Promise((resolve, reject) => {
 		if ( ! isWin32) {
 			reject(plateformError);
 			return;
 		}
 
-        api.EnumWindows.async(enumWindowsProc, pid, (err) => {
-            const res = Array.from(HWNDSet);
-
-            HWNDSet.clear();
-            resolve(res);
+        if ( ! task) {
+            return resolve([]);
+        }
+        api.EnumWindows.async(enumWindowsProc, task.tno, (err) => {
+            resolve(Array.from(task.hwndSet) || []);
         });
 	});
 }
 
-function get_hwnd_by_keyword(): Promise<number[]> {
-	return new Promise((resolve, reject) => {
-		if ( ! isWin32) {
-			reject(plateformError);
-			return;
-		}
 
-        api.EnumWindows.async(enumWindowsProc, 0, (err) => {
-            const res = Array.from(HWNDSet);
-
-            HWNDSet.clear();
-            resolve(res);
-        });
-	});
-}
 
 // get hWnd of main top-level window
 function filter_main_hwnd(arr: number[]): number | void {
@@ -359,38 +353,42 @@ function is_main_window(hWnd: number): boolean {
 }
 
 
-const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, lParam: number): boolean => {
-    let pid = 0;
+// 返回false终止迭代
+const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, lParam: Tno): boolean => {
+    const task = config.task.get(lParam);
 
-    if (decProcId > 0) {
+    if ( ! task) {
+        return true;
+    }
+
+    if (task.pid > 0) {
         const buf = Buffer.alloc(8);
 
         api.GetWindowThreadProcessId(hWnd, buf);
-        const hex = buf.readUIntLE(0, 8);
+        const pid = buf.readUIntLE(0, 8);
 
-        if (hex && hex === decProcId) {
-            HWNDSet.add(hWnd);
+        if (pid && pid === task.pid) {
+            task.hwndSet.add(hWnd);
         }
     }
     else {
-        if (matchTitle) {
-            let buf, name, ret, visible;
+        if (task.title) {
+            const buf = Buffer.alloc(254);
+            const ret = api.GetWindowTextW(hWnd, buf, 254);
+            const name = buf.toString('ucs2');
+            // const visible = api.IsWindowVisible(hWnd);
 
-            buf = Buffer.alloc(254);
-            ret = api.GetWindowTextW(hWnd, buf, 254);
-            name = buf.toString('ucs2');
-            // visible = api.IsWindowVisible(hWnd);
-            if (name.indexOf(matchTitle) !== -1) {
+            if (name.indexOf(task.title) !== -1) {
                 const buf = Buffer.alloc(8);
 
                 api.GetWindowThreadProcessId(hWnd, buf);
-                killProcIdSet.add(buf.readUIntLE(0, 8));
-                HWNDSet.add(hWnd);
+                task.pidSet.add(buf.readUIntLE(0, 8));
+                task.hwndSet.add(hWnd);
                 // console.log(`${hWnd}: ${name}`);
             }
         }
         else {  // all
-            HWNDSet.add(hWnd);
+            task.hwndSet.add(hWnd);
         }
     }
     return true;
@@ -404,10 +402,12 @@ export function kill(p: matchParam): Promise<void> {
     }
     else if (typeof p === 'string') {
         return new Promise((resolve) => {
-            return get_hwnds(p).then(() => {
-                if (killProcIdSet.size) {
-                    for (let pid of killProcIdSet) {
-                        _kill(pid);
+            const task = create_task();
+
+            return _get_hwnds(p, task).then(() => {
+                if (task.pidSet.size) {
+                    for (let pid of task.pidSet) {
+                       _kill(pid);
                     }
                 }
                 else {
@@ -423,7 +423,7 @@ export function kill(p: matchParam): Promise<void> {
     }
 }
 
-function _kill(pid: number): void {
+function _kill(pid: Pid): void {
     try {
         process.kill(pid, 0) && process.kill(pid);
         console.log(`killed pid: ${pid}`);
@@ -431,4 +431,19 @@ function _kill(pid: number): void {
     catch(ex) {
         console.error(ex);
     }
+}
+
+function create_task(): Task {
+    const tno = ++config.tno;
+    const task: Task = {
+        tno,
+        pid: 0,
+        title: '',
+        hwndSet: new Set(),
+        pidSet: new Set(),
+    }
+
+    config.task.set(tno, task);
+
+    return task;
 }
