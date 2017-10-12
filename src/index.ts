@@ -17,51 +17,51 @@ const plateformError = 'Invalid platform: win32 required';
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx
 export enum CmdShow {
-	// Hides the window and activates another window.
-	SW_HIDE = 0,
+    // Hides the window and activates another window.
+    SW_HIDE = 0,
 
-	// Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. An application should specify this flag when displaying the window for the first time.
-	SW_SHOWNORMAL = 1,
+    // Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. An application should specify this flag when displaying the window for the first time.
+    SW_SHOWNORMAL = 1,
 
-	// Activates the window and displays it as a minimized window.
-	SW_SHOWMINIMIZED = 2,
+    // Activates the window and displays it as a minimized window.
+    SW_SHOWMINIMIZED = 2,
 
-	// Activates the window and displays it as a maximized window.
-	SW_SHOWMAXIMIZED = 3,
+    // Activates the window and displays it as a maximized window.
+    SW_SHOWMAXIMIZED = 3,
 
-	// Maximizes the specified window.
-	SW_MAXIMIZE = 3,
+    // Maximizes the specified window.
+    SW_MAXIMIZE = 3,
 
-	// Displays a window in its most recent size and position. This value is similar to SW_SHOWNORMAL, except that the window is not activated.
-	SW_SHOWNOACTIVATE = 4,
+    // Displays a window in its most recent size and position. This value is similar to SW_SHOWNORMAL, except that the window is not activated.
+    SW_SHOWNOACTIVATE = 4,
 
-	// Activates the window and displays it in its current size and position.
-	SW_SHOW = 5,
+    // Activates the window and displays it in its current size and position.
+    SW_SHOW = 5,
 
-	// Minimizes the specified window and activates the next top-level window in the Z order.
-	SW_MINIMIZE = 6,
+    // Minimizes the specified window and activates the next top-level window in the Z order.
+    SW_MINIMIZE = 6,
 
-	// Displays the window as a minimized window. This value is similar to SW_SHOWMINIMIZED, except the window is not activated.
-	SW_SHOWMINNOACTIVE = 7,
+    // Displays the window as a minimized window. This value is similar to SW_SHOWMINIMIZED, except the window is not activated.
+    SW_SHOWMINNOACTIVE = 7,
 
-	// Displays the window in its current size and position. This value is similar to SW_SHOW, except that the window is not activated.
-	SW_SHOWNA = 8,
+    // Displays the window in its current size and position. This value is similar to SW_SHOW, except that the window is not activated.
+    SW_SHOWNA = 8,
 
-	// Activates and displays the window. If the window is minimized or maximized, the system restores it to its original size and position.
-	SW_RESTORE = 9,
+    // Activates and displays the window. If the window is minimized or maximized, the system restores it to its original size and position.
+    SW_RESTORE = 9,
 
-	// Sets the show state based on the SW_ value specified in the STARTUPINFO structure passed to the CreateProcess function by the program that started the application.
-	SW_SHOWDEFAULT = 10,
+    // Sets the show state based on the SW_ value specified in the STARTUPINFO structure passed to the CreateProcess function by the program that started the application.
+    SW_SHOWDEFAULT = 10,
 
-	// Minimizes a window, even if the thread that owns the window is not responding. This flag should only be used when minimizing windows from a different thread.
-	SW_FORCEMINIMIZE = 11,
+    // Minimizes a window, even if the thread that owns the window is not responding. This flag should only be used when minimizing windows from a different thread.
+    SW_FORCEMINIMIZE = 11,
 }
 
 export type matchParam = number | string;    // pid or keyword
 
 export interface Api {
     EnumWindows: EnumWindows;
-	GetWindowThreadProcessId(hWnd: number, lpdwProcessId: Buffer): number;
+    GetWindowThreadProcessId(hWnd: number, lpdwProcessId: Buffer): number;
     GetWindowTextW(hWnd: number, lpString: Buffer, nMaxCount: number): number;
     IsWindowVisible(hWnd: number): boolean;
     ShowWindow(hWnd: number, nCmdShow: number): boolean;
@@ -75,10 +75,10 @@ export interface EnumWindows {
 
 const api: Api = ffi.Library('user32.dll', {
     EnumWindows: ['bool', ['pointer', 'int32'] ],
-	GetWindowThreadProcessId: ['uint32', ['uint', 'pointer'] ],
-    GetWindowTextW: ['long', ['long', 'CString', 'long'] ],
-    IsWindowVisible: ['bool', ['int32'] ],
-    ShowWindow: ['bool', ['uint32', 'int'] ],
+    GetWindowThreadProcessId: ['uint32', ['uint', 'pointer']],
+    GetWindowTextW: ['long', ['long', 'CString', 'long']],
+    IsWindowVisible: ['bool', ['int32']],
+    ShowWindow: ['bool', ['uint32', 'int']],
     GetParent: ['uint32', ['uint32']],
     GetAncestor: ['uint', ['uint32', 'uint']],
 });
@@ -112,7 +112,7 @@ export default function showWindow(hWnd: number, nCmdShow: CmdShow): ErrCode {
     let errcode = 1;
 
     if ( ! Number.isSafeInteger(hWnd)) {
-        console.error('hWnd must integer')
+        console.error('hWnd must integer');
         return errcode;
     }
     if ( ! validate_cmdshow(nCmdShow)) {
@@ -124,7 +124,7 @@ export default function showWindow(hWnd: number, nCmdShow: CmdShow): ErrCode {
             errcode = 0;
         }
     }
-    catch(ex) {
+    catch (ex) {
         console.error(ex);
     }
 
@@ -154,7 +154,7 @@ function proxy(p: matchParam, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<
         return Promise.resolve();
     }
 
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
         if (onlyMainWin) {
             get_main_hwnd(p).then(hWnd => {
                 if (hWnd && typeof hWnd === 'number') {
@@ -205,7 +205,7 @@ function _show(hWnd: number, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<v
         try {
             api.ShowWindow(id, nCmdShow);
         }
-        catch(ex) {
+        catch (ex) {
             return reject(ex);
         }
         resolve();
@@ -239,7 +239,7 @@ function _get_hwnds(p: matchParam, task?: Task): Promise<number[] | void> {
     let t: NodeJS.Timer;
 
     return Promise.race([
-        new Promise((resolve) => {
+        new Promise(resolve => {
             t = setTimeout(() => {
                 console.error('timeout failed');
                 resolve();
@@ -296,19 +296,19 @@ function _get_hwnd(p: matchParam, task: Task): Promise<number[] | void> {
 
 
 function get_hwnd(task: Task): Promise<number[]> {
-	return new Promise((resolve, reject) => {
-		if ( ! isWin32) {
-			reject(plateformError);
-			return;
-		}
+    return new Promise((resolve, reject) => {
+        if (!isWin32) {
+            reject(plateformError);
+            return;
+        }
 
         if ( ! task) {
             return resolve([]);
         }
-        api.EnumWindows.async(enumWindowsProc, task.tno, (err) => {
+        api.EnumWindows.async(enumWindowsProc, task.tno, err => {
             resolve(Array.from(task.hwndSet) || []);
         });
-	});
+    });
 }
 
 
@@ -402,7 +402,7 @@ export function kill(p: matchParam): Promise<void> {
         return Promise.resolve();
     }
     else if (typeof p === 'string') {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             const task = create_task();
 
             return _get_hwnds(p, task).then(() => {
@@ -429,7 +429,7 @@ function _kill(pid: Pid): void {
         process.kill(pid, 0) && process.kill(pid);
         console.log(`killed pid: ${pid}`);
     }
-    catch(ex) {
+    catch (ex) {
         console.error(ex);
     }
 }
@@ -442,7 +442,7 @@ function create_task(): Task {
         title: '',
         hwndSet: new Set(),
         pidSet: new Set(),
-    }
+    };
 
     config.task.set(tno, task);
 
