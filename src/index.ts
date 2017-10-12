@@ -84,7 +84,6 @@ const api: Api = ffi.Library('user32.dll', {
 });
 
 const HWNDSet: Set<number> = new Set(); // dec[]
-let hexProcId: string = ''; // hex
 let decProcId: number = 0;
 let matchTitle: string = '';
 let processing = false;
@@ -256,7 +255,6 @@ function _get_hwnd(p: matchParam): Promise<number[] | void> {
         }
 
         decProcId = p;
-        hexProcId = p.toString(16);
         matchTitle = '';
         return get_hwnd_by_pid(p)
             .then(res => {
@@ -271,7 +269,6 @@ function _get_hwnd(p: matchParam): Promise<number[] | void> {
     }
     else if (typeof p === 'string') {
         decProcId = 0;
-        hexProcId = '';
         matchTitle = p;
         return get_hwnd_by_keyword()
             .then(res => {
@@ -370,9 +367,9 @@ const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, l
         const buf = Buffer.alloc(8);
 
         api.GetWindowThreadProcessId(hWnd, buf);
-        const hex = buf.readUIntLE(0, 8).toString();
+        const hex = buf.readUIntLE(0, 8);
 
-        if (hex && hex === hexProcId) {
+        if (hex && hex === decProcId) {
             HWNDSet.add(hWnd);
         }
     }
