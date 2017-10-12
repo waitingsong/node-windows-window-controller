@@ -9,6 +9,7 @@
     "hide-window": "./dist/bin/hide-window.js"
   },
   "scripts": {
+    "lint": "tslint --fix -e **/*.d.ts -t stylish src/**/*.ts test/**/*.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepublishOnly": "npm run build",
     "build": "rm -rf dist/* && tsc -p ./ --outDir dist/"
