@@ -12,7 +12,7 @@
     "lint": "tslint --fix -e **/*.d.ts -t stylish src/**/*.ts test/**/*.ts",
     "test": "npm run lint",
     "prepublishOnly": "npm run build",
-    "build": "rm -rf dist/* && tsc -p ./ --outDir dist/"
+    "build": "npm run test && rm -rf dist/* && tsc -p ./ --outDir dist/"
   },
   "keywords": [
     "window",
