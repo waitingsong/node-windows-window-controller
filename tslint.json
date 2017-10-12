@@ -4,7 +4,7 @@
     "jsRules": {},
     "rules": {
       "align": false,
-      "arrow-parens": [ true, "ban-single-arg-parens" ],
+      "arrow-parens": false,
       "ban-types": [true, ["Object", "Use {} instead."]],
       "comment-format": false,
       "indent": [true, "spaces", 4],
@@ -21,7 +21,7 @@
       "no-empty": true,
       "no-eval": true,
       "no-namespace": true,
-      "no-shadowed-variable": true,
+      "no-shadowed-variable": false,
       "no-switch-case-fall-through": true,
       "no-unnecessary-initializer": true, // 需要测试
       "no-unused-expression": [true, "allow-fast-null-checks"],
