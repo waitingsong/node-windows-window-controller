@@ -397,6 +397,7 @@ const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, l
     return true;
 });
 
+// kill process by which the matched hWnd(s) (window) created
 export function kill(p: matchParam): Promise<void> {
     return new Promise((resolve) => {
         get_main_hwnd(p).then(hWnd => {
