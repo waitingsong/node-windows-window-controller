@@ -213,7 +213,7 @@ export function get_hwnds(p: matchParam): Promise<number[] | void> {
             t = setTimeout(() => {
                 console.error('timeout failed');
                 resolve();
-            }, 30000); // @HARDCODED
+            }, 30000); // @HARDCOD
         }),
         _get_hwnd(p),
     ]).then(res => {
@@ -237,7 +237,6 @@ export function get_main_hwnd(p: matchParam): Promise<number | void> {
 }
 
 function _get_hwnd(p: matchParam): Promise<number[] | void> {
-
     if (processing) {
         return new Promise((resolve) => {
             setTimeout((p) => {
@@ -399,20 +398,37 @@ const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, l
 
 // kill process by which the matched hWnd(s) (window) created
 export function kill(p: matchParam): Promise<void> {
-    return new Promise((resolve) => {
-        get_main_hwnd(p).then(hWnd => {
-            if (killProcIdSet.size) {
-                try {
+    if (typeof p === 'number') {
+        _kill(p);
+        return Promise.resolve();
+    }
+    else if (typeof p === 'string') {
+        return new Promise((resolve) => {
+            return get_hwnds(p).then(() => {
+                if (killProcIdSet.size) {
                     for (let pid of killProcIdSet) {
-                        process.kill(pid, 0) && process.kill(pid);
-                        console.log(`killed pid: ${pid}`);
+                        _kill(pid);
                     }
                 }
-                catch(ex) {
-                    console.error(ex);
+                else {
+                    console.log('the pid list to be killed empty');
                 }
                 resolve();
-            }
+            });
         });
-    });
+    }
+    else {
+        console.error('kill() param must be either number or string');
+        return Promise.resolve();
+    }
+}
+
+function _kill(pid: number): void {
+    try {
+        process.kill(pid, 0) && process.kill(pid);
+        console.log(`killed pid: ${pid}`);
+    }
+    catch(ex) {
+        console.error(ex);
+    }
 }

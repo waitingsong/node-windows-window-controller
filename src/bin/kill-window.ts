@@ -3,6 +3,7 @@
 /**
  * kill process by which the matched hWnd(s) (window) created
  * optins: 
+ * --pid={number}
  * --title={string}
  */
 
@@ -12,7 +13,7 @@ const [,, ...argv] = process.argv;
 let param: string | number = 0;
 
 if ( ! argv || ! argv.length) {
-    console.error('argv empty. options: --title');
+    console.error('argv empty. options: --title or --pid');
     process.exit(1);
 }
 
