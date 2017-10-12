@@ -236,7 +236,7 @@ function _get_hwnds(p: matchParam, task?: Task): Promise<number[] | void> {
     if ( ! task) {
         task = create_task();
     }
-    let t;
+    let t: NodeJS.Timer;
 
     return Promise.race([
         new Promise((resolve) => {
