@@ -216,7 +216,7 @@ function proxy(p: matchParam, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<
                         })
                         .catch(err => {
                             execRet.err = 1;
-                            execRet.msg += '\n ' + err; 
+                            execRet.msg += '\n ' + err;
                         })
                         .then(() => {
                             resolve();
