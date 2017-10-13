@@ -43,7 +43,7 @@
     "no-array-constructor": 2,
     "no-confusing-arrow": 2,
     "no-duplicate-imports": 2,
-    "no-useless-computed-key": 2,
+    "no-useless-computed-key": 0, // 0 for destructuring assignment
     "no-useless-constructor": 2,
     "no-useless-rename": 2,
     "no-console": 0
