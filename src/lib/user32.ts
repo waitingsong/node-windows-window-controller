@@ -82,14 +82,6 @@ export const taskConfig: TaskConfig = {
     task: new Map(),
 };
 
-export type ErrCode = number; // 0: no error
-export interface ExecRet {
-    err: ErrCode;
-    msg: string;
-    pids: Config.Pid[];    // processed processId
-    hwnds: Config.Hwnd[];  // processed hWnd
-}
-
 
 // stop loop if return false
 export const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, lParam: Config.Tno): boolean => {
