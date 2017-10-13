@@ -10,9 +10,10 @@
   },
   "scripts": {
     "lint": "tslint --fix -e **/*.d.ts -t stylish src/**/*.ts test/**/*.ts",
+    "jslint": "eslint --fix dist/**/*.js",
     "test": "npm run lint",
     "prepublishOnly": "npm run build",
-    "build": "npm run test && rm -rf dist/* && tsc -p ./ --outDir dist/"
+    "build": "npm run test && rm -rf dist/* && tsc -p ./ --outDir dist/ && npm run jslint"
   },
   "keywords": [
     "window",
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@types/ffi": "^0.0.19",
     "@types/node": "^8.0.25",
+    "eslint": "^4.8.0",
     "rimraf": "^2.6.1",
     "ts-node": "^3.3.0",
     "tslint": "^5.7.0",
