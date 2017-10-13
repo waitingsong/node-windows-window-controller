@@ -104,8 +104,13 @@ const config: Config = {
     task: new Map(),
 };
 
-
 export type ErrCode = number; // 0: no error
+interface ExecRet {
+    err: ErrCode;
+    msg: string;
+    pids: Pid[];    // processed processId
+    hwnds: Hwnd[];  // processed hWnd
+}
 
 
 // stop loop if return false
@@ -183,18 +188,21 @@ export function validate_cmdshow(nCmdShow: CmdShow): boolean {
     return res;
 }
 
-export function hide(p: matchParam, onlyMainWin: boolean = true): Promise<void> {
+export function hide(p: matchParam, onlyMainWin: boolean = true): Promise<ExecRet> {
     return proxy(p, CmdShow.SW_HIDE, onlyMainWin);
 }
 
-export function show(p: matchParam, nCmdShow: CmdShow, onlyMainWin: boolean = true): Promise<void> {
+export function show(p: matchParam, nCmdShow: CmdShow, onlyMainWin: boolean = true): Promise<ExecRet> {
     return proxy(p, nCmdShow, onlyMainWin);
 }
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx
-function proxy(p: matchParam, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<void> {
+function proxy(p: matchParam, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<ExecRet> {
+    const execRet = init_execret();
+
     if ( ! validate_cmdshow(nCmdShow)) {
-        return Promise.resolve();
+        execRet.msg = 'value of nCmdShow invalid';
+        return Promise.resolve(execRet);
     }
 
     return new Promise(resolve => {
@@ -310,7 +318,7 @@ function _get_hwnd(p: matchParam, task: Task): Promise<number[] | void> {
 
         task.pid = p;
         task.title = '';
-        return get_hwnd(task)
+        return get_task_hwnd(task)
             .then(res => {
                 return res;
             })
@@ -322,7 +330,7 @@ function _get_hwnd(p: matchParam, task: Task): Promise<number[] | void> {
     else if (typeof p === 'string') {
         task.pid = 0;
         task.title = p;
-        return get_hwnd(task)
+        return get_task_hwnd(task)
             .then(res => {
                 return res;
             })
@@ -338,7 +346,7 @@ function _get_hwnd(p: matchParam, task: Task): Promise<number[] | void> {
 }
 
 
-function get_hwnd(task: Task): Promise<number[]> {
+function get_task_hwnd(task: Task): Promise<number[]> {
     return new Promise((resolve, reject) => {
         if (!isWin32) {
             reject(plateformError);
@@ -449,4 +457,13 @@ function create_task(): Task {
     config.task.set(tno, task);
 
     return task;
+}
+
+function init_execret(): ExecRet {
+    return {
+        err: 0,
+        msg: '',
+        pids: [],
+        hwnds: [],
+    };
 }
