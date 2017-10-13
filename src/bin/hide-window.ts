@@ -45,4 +45,7 @@ if (!param) {
 }
 
 
-nwwc.hide(param).then(() => process.exit(0));
+nwwc.hide(param).then((execRet) => {
+    console.log('process ret:', execRet);
+    process.exit(execRet.err);
+});

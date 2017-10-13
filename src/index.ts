@@ -105,7 +105,7 @@ const config: Config = {
 };
 
 export type ErrCode = number; // 0: no error
-interface ExecRet {
+export interface ExecRet {
     err: ErrCode;
     msg: string;
     pids: Pid[];    // processed processId
@@ -201,6 +201,7 @@ function proxy(p: matchParam, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<
     const execRet = init_execret();
 
     if ( ! validate_cmdshow(nCmdShow)) {
+        execRet.err = 1;
         execRet.msg = 'value of nCmdShow invalid';
         return Promise.resolve(execRet);
     }
@@ -209,27 +210,45 @@ function proxy(p: matchParam, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<
         if (onlyMainWin) {
             get_main_hwnd(p).then(hWnd => {
                 if (hWnd && typeof hWnd === 'number') {
-                    _show(hWnd, nCmdShow, onlyMainWin).then(() => {
-                        resolve();
-                    });
+                    _show(hWnd, nCmdShow, onlyMainWin)
+                        .then((hWnd) => {
+                            hWnd && execRet.hwnds.push(hWnd);
+                        })
+                        .catch(err => {
+                            execRet.err = 1;
+                            execRet.msg += '\n ' + err; 
+                        })
+                        .then(() => {
+                            resolve();
+                        });
                 }
-                resolve();
+                else {
+                    resolve();
+                }
             });
         }
         else {
             get_hwnds(p).then(arr => {
                 if (arr && arr.length) {
-                    Promise.all(arr.map(hWnd => _show(hWnd, nCmdShow, onlyMainWin))).then(() => {
-                        resolve();
-                    });
+                    Promise.all(arr.map(hWnd => {
+                        return _show(hWnd, nCmdShow, onlyMainWin)
+                            .then((hWnd) => hWnd && execRet.hwnds.push(hWnd))
+                            .catch(err => {
+                                execRet.err = 1;
+                                execRet.msg += '\n ' + err;
+                            });
+                    }))
+                        .then(resolve);
                 }
-                resolve();
+                else {
+                    resolve();
+                }
             });
         }
-    });
+    }).then(() => execRet);
 }
 
-function _show(hWnd: number, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<void> {
+function _show(hWnd: number, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<void | Hwnd> {
     return new Promise((resolve, reject) => {
         const id = +hWnd;
 
@@ -239,12 +258,10 @@ function _show(hWnd: number, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<v
         nCmdShow = +nCmdShow;
 
         if ( ! id || Number.isNaN(id)) {
-            console.error('_show() params hWnd invalid', hWnd);
-            return resolve();
+            return reject('_show() params hWnd invalid: ' + hWnd);
         }
         if (Number.isNaN(nCmdShow) || nCmdShow < 0) {
-            console.error('_show() params nCmdShow invalid', nCmdShow);
-            return resolve();
+            return reject('_show() params nCmdShow invalid: ' + nCmdShow);
         }
 
         if (nCmdShow === 0) {
@@ -259,14 +276,7 @@ function _show(hWnd: number, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<v
         catch (ex) {
             return reject(ex);
         }
-        resolve();
-    })
-    .then(() => {
-        console.log(`hWnd: ${hWnd} done`);
-        return;
-    })
-    .catch(err => {
-        err && console.error(err);
+        resolve(id);
     });
 }
 
@@ -406,10 +416,13 @@ function is_main_window(hWnd: number): boolean {
 
 
 // kill process by which the matched hWnd(s) (window) created
-export function kill(p: matchParam): Promise<void> {
+export function kill(p: matchParam): Promise<ExecRet> {
+    const execRet = init_execret();
+
     if (typeof p === 'number') {
         _kill(p);
-        return Promise.resolve();
+        execRet.pids.push(p);
+        return Promise.resolve(execRet);
     }
     else if (typeof p === 'string') {
         return new Promise(resolve => {
@@ -418,30 +431,34 @@ export function kill(p: matchParam): Promise<void> {
             return _get_hwnds(p, task).then(() => {
                 if (task.pidSet.size) {
                     for (let pid of task.pidSet) {
-                       _kill(pid);
+                        if (_kill(pid)) {
+                            execRet.pids.push(pid);
+                        }
                     }
                 }
                 else {
-                    console.log('the pid list to be killed empty');
+                    execRet.msg = 'the pid list to be killed empty';
                 }
-                resolve();
+                resolve(execRet);
             });
         });
     }
     else {
-        console.error('kill() param must be either number or string');
-        return Promise.resolve();
+        execRet.err = 1;
+        execRet.msg = 'kill() param must be either number or string';
+        return Promise.resolve(execRet);
     }
 }
 
-function _kill(pid: Pid): void {
+function _kill(pid: Pid): boolean {
     try {
         process.kill(pid, 0) && process.kill(pid);
-        console.log(`killed pid: ${pid}`);
+        return true;
     }
     catch (ex) {
         console.error(ex);
     }
+    return false;
 }
 
 function create_task(): Task {

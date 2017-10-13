@@ -59,4 +59,7 @@ if (!nwwc.validate_cmdshow(status)) {
     process.exit(1);
 }
 
-nwwc.show(param, status).then(() => process.exit(0));
+nwwc.show(param, status).then((execRet) => {
+    console.log('process ret:', execRet);
+    process.exit(execRet.err);
+});
