@@ -30,7 +30,7 @@
       "object-literal-shorthand": false,  // Enforces use of ES6 object literal shorthand when possible
       "object-literal-sort-keys": false,
       "one-line": false,
-      "ordered-imports": true,
+      "ordered-imports": false,
       "prefer-const": false,
       "prefer-for-of": false,
       "quotemark": [true, "single", "jsx-double", "avoid-escape"],
