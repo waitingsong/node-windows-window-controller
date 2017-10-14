@@ -13,7 +13,7 @@ let status: number = -1;
 
 if (!argv || !argv.length) {
     console.error('argv empty. arguments: --hwnd --status');
-    console.log('status value See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548()v=vs.85).aspx)');
+    console.log('status value See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx');
     process.exit(1);
 }
 
