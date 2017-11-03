@@ -31,7 +31,7 @@ export const enumWindowsProc = ffi.Callback(
         }
 
         switch (task.matchType) {
-            case 'pid':
+            case 'pid': {
                 const buf = ref.alloc(W.HINSTANCE);
 
                 user32.GetWindowThreadProcessId(hWnd, buf);
@@ -41,6 +41,7 @@ export const enumWindowsProc = ffi.Callback(
                     task.hwndSet.add(hWnd);
                 }
                 break;
+            }
 
             case 'title':
                 if (task.matchValue) {
