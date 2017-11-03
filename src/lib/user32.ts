@@ -1,75 +1,12 @@
 import * as ffi from 'ffi';
+import * as ref from 'ref';
+import {U, conf as GCF, types as GT, windef as W} from 'win32-api';
 import * as Config from './types';
+
+const user32 = U.load();
 
 const isWin32: boolean = process.platform === 'win32';
 const plateformError = 'Invalid platform: win32 required';
-
-// https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx
-export enum CmdShow {
-    // Hides the window and activates another window.
-    SW_HIDE = 0,
-
-    // Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. An application should specify this flag when displaying the window for the first time.
-    SW_SHOWNORMAL = 1,
-
-    // Activates the window and displays it as a minimized window.
-    SW_SHOWMINIMIZED = 2,
-
-    // Activates the window and displays it as a maximized window.
-    SW_SHOWMAXIMIZED = 3,
-
-    // Maximizes the specified window.
-    SW_MAXIMIZE = 3,
-
-    // Displays a window in its most recent size and position. This value is similar to SW_SHOWNORMAL, except that the window is not activated.
-    SW_SHOWNOACTIVATE = 4,
-
-    // Activates the window and displays it in its current size and position.
-    SW_SHOW = 5,
-
-    // Minimizes the specified window and activates the next top-level window in the Z order.
-    SW_MINIMIZE = 6,
-
-    // Displays the window as a minimized window. This value is similar to SW_SHOWMINIMIZED, except the window is not activated.
-    SW_SHOWMINNOACTIVE = 7,
-
-    // Displays the window in its current size and position. This value is similar to SW_SHOW, except that the window is not activated.
-    SW_SHOWNA = 8,
-
-    // Activates and displays the window. If the window is minimized or maximized, the system restores it to its original size and position.
-    SW_RESTORE = 9,
-
-    // Sets the show state based on the SW_ value specified in the STARTUPINFO structure passed to the CreateProcess function by the program that started the application.
-    SW_SHOWDEFAULT = 10,
-
-    // Minimizes a window, even if the thread that owns the window is not responding. This flag should only be used when minimizing windows from a different thread.
-    SW_FORCEMINIMIZE = 11,
-}
-
-
-export interface User32 {
-    EnumWindows: EnumWindows;
-    GetWindowThreadProcessId(hWnd: number, lpdwProcessId: Buffer): number;
-    GetWindowTextW(hWnd: number, lpString: Buffer, nMaxCount: number): number;
-    IsWindowVisible(hWnd: number): boolean;
-    ShowWindow(hWnd: number, nCmdShow: number): boolean;
-    GetParent(hWnd: number): number | null;
-    GetAncestor(hwnd: number, gaFlags: number): number;
-}
-export interface EnumWindows {
-    (lpEnumFunc: Buffer, lParam: Config.Tno): boolean;
-    async(lpEnumFunc: Buffer, lParam: Config.Tno, cb: (err: Error) => void): boolean;
-}
-
-export const api: User32 = ffi.Library('user32.dll', {
-    EnumWindows: ['bool', ['pointer', 'int32'] ],
-    GetWindowThreadProcessId: ['uint32', ['uint', 'pointer']],
-    GetWindowTextW: ['long', ['long', 'CString', 'long']],
-    IsWindowVisible: ['bool', ['int32']],
-    ShowWindow: ['bool', ['uint32', 'int']],
-    GetParent: ['uint32', ['uint32']],
-    GetAncestor: ['uint', ['uint32', 'uint']],
-});
 
 
 export interface TaskConfig {
@@ -84,104 +21,115 @@ export const taskConfig: TaskConfig = {
 
 
 // stop loop if return false
-export const enumWindowsProc = ffi.Callback('bool', ['uint32', 'int'], (hWnd: number, lParam: Config.Tno): boolean => {
-    const task = taskConfig.task.get(lParam);
+export const enumWindowsProc = ffi.Callback(
+    W.BOOL, [W.HWND, W.LPARAM],
+    (hWnd: GT.HWND, lParam: GT.LPARAM): boolean => {
+        const task = taskConfig.task.get(<number> lParam);
 
-    if ( ! task) {
+        if (!task) {
+            return true;
+        }
+
+        switch (task.matchType) {
+            case 'pid':
+                const buf = ref.alloc(W.HINSTANCE);
+
+                user32.GetWindowThreadProcessId(hWnd, buf);
+                const pid = buf.readUInt32LE(0);
+
+                if (pid && pid === task.matchValue) {
+                    task.hwndSet.add(hWnd);
+                }
+                break;
+
+            case 'title':
+                if (task.matchValue) {
+                    const buf = Buffer.alloc(254);
+                    const ret = user32.GetWindowTextW(hWnd, buf, 254);
+                    const name = buf.toString('ucs2');
+                    // const visible = user32.IsWindowVisible(hWnd);
+
+                    if (name.indexOf(<string> task.matchValue) !== -1) {
+                        const buf = Buffer.alloc(4);
+
+                        user32.GetWindowThreadProcessId(hWnd, buf);
+                        task.pidSet.add(buf.readUIntLE(0, 4));
+                        task.hwndSet.add(hWnd);
+                    }
+                }
+                else {  // all
+                    task.hwndSet.add(hWnd);
+                }
+                break;
+
+            case 'hwnd':
+                if (+task.matchValue === ref.address(hWnd)) {
+                    task.hwndSet.add(hWnd);
+                }
+                break;
+
+            default:
+                return true;
+        }
+
         return true;
     }
+);
 
-    if (task.pid > 0) {
-        const buf = Buffer.alloc(8);
+export function validate_cmdshow(nCmdShow: U.constants.CmdShow): boolean {
+    const res = (nCmdShow < 0) ? false : true;
 
-        api.GetWindowThreadProcessId(hWnd, buf);
-        const pid = buf.readUIntLE(0, 8);
-
-        if (pid && pid === task.pid) {
-            task.hwndSet.add(hWnd);
-        }
-    }
-    else {
-        if (task.title) {
-            const buf = Buffer.alloc(254);
-            const ret = api.GetWindowTextW(hWnd, buf, 254);
-            const name = buf.toString('ucs2');
-            // const visible = api.IsWindowVisible(hWnd);
-
-            if (name.indexOf(task.title) !== -1) {
-                const buf = Buffer.alloc(8);
-
-                api.GetWindowThreadProcessId(hWnd, buf);
-                task.pidSet.add(buf.readUIntLE(0, 8));
-                task.hwndSet.add(hWnd);
-                // console.log(`${hWnd}: ${name}`);
-            }
-        }
-        else {  // all
-            task.hwndSet.add(hWnd);
-        }
-    }
-    return true;
-});
-
-export function validate_cmdshow(nCmdShow: CmdShow): boolean {
-    const res = (nCmdShow < 0 || typeof CmdShow[nCmdShow] === 'undefined') ? false : true;
-
-    if ( ! res) {
+    if (!res) {
         console.error('hWnd value invalid: See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx');
     }
     return res;
 }
 
 
-export function show(hWnd: number, nCmdShow: CmdShow, onlyMainWin: boolean): Promise<void | Config.Hwnd> {
+export function show(hWnd: GT.HWND, nCmdShow: U.constants.CmdShow, onlyMainWin: GT.BOOLEAN): Promise<void | GT.HWND> {
     return new Promise((resolve, reject) => {
-        const id = +hWnd;
-
-        if (onlyMainWin &&  ! is_main_window(hWnd)) {
+        if (onlyMainWin && !is_main_window(hWnd)) {
             return resolve();
         }
         nCmdShow = +nCmdShow;
 
-        if ( ! id || Number.isNaN(id)) {
-            return reject('show() params hWnd invalid: ' + hWnd);
-        }
         if (Number.isNaN(nCmdShow) || nCmdShow < 0) {
             return reject('show() params nCmdShow invalid: ' + nCmdShow);
         }
 
         if (nCmdShow === 0) {
-            if ( ! api.IsWindowVisible(id)) {   // skip if invisible
+            if (!user32.IsWindowVisible(hWnd)) {   // skip if invisible
                 return resolve();
             }
         }
 
         try {
-            api.ShowWindow(id, nCmdShow);
+            user32.ShowWindow(hWnd, nCmdShow);
         }
         catch (ex) {
             return reject(ex);
         }
-        resolve(id);
+        resolve(hWnd);
     });
 }
 
 
-export function get_hwnds(p: Config.matchParam, task?: Config.Task): Promise<number[] | void> {
-    if ( ! task) {
+export function get_hwnds(p: Config.matchParam, task?: Config.Task): Promise<GT.HWND[] | void> {
+    if (!task) {
         task = create_task();
     }
+    task.matchValue = p;
     let t: NodeJS.Timer;
 
     return Promise.race([
-        new Promise(resolve => {
+        new Promise<void>(resolve => {
             t = setTimeout(() => {
                 console.error('timeout failed');
                 resolve();
-            }, 30000); // @HARDCOD
+            }, 10000); // @HARDCOD
         }),
-        get_hwnd(p, task),
-    ]).then(res => {
+        _get_hwnds(task),
+    ]).then((res: void | GT.HWND[]) => {
         clearTimeout(t);
         task && taskConfig.task.delete(task.tno);
         if (res && Array.isArray(res) && res.length) {
@@ -194,53 +142,52 @@ export function get_hwnds(p: Config.matchParam, task?: Config.Task): Promise<num
     });
 }
 
-export function get_hwnd(p: Config.matchParam, task: Config.Task): Promise<number[] | void> {
-    if (typeof p === 'number') {
-        if ( ! Number.isSafeInteger(p)) {
-            return Promise.resolve();
+function _get_hwnds(task: Config.Task): Promise<GT.HWND[] | void> {
+    if (task.matchType === null) {
+        if (typeof task.matchValue === 'string') {
+            task.matchType = 'title';
         }
-
-        task.pid = p;
-        task.title = '';
-        return get_task_hwnd(task)
-            .then(res => {
-                return res;
-            })
-            .catch(err => {
-                console.error(err);
-                return;
-            });
+        else if (typeof task.matchValue === 'number') { // hwnd must be specified explicitly
+            task.matchType = 'pid';
+        }
     }
-    else if (typeof p === 'string') {
-        task.pid = 0;
-        task.title = p;
-        return get_task_hwnd(task)
-            .then(res => {
-                return res;
-            })
-            .catch(err => {
-                console.error(err);
-                return;
-            });
+    switch (task.matchType) {
+        case 'pid':
+            if (!Number.isSafeInteger(<number> task.matchValue)) {
+                return Promise.resolve();
+            }
+            break;
+        case 'title':
+            // void
+            break;
+        case 'hwnd':
+            // void
+            break;
+        default:
+            throw new Error('task.matchType value invalid');
     }
-    else {
-        console.error('param p invalid', p);
-        return Promise.resolve();
-    }
+    return get_task_hwnd(task)
+        .then(res => {
+            return res;
+        })
+        .catch(err => {
+            console.error(err);
+            return;
+        });
 }
 
 
-function get_task_hwnd(task: Config.Task): Promise<number[]> {
+function get_task_hwnd(task: Config.Task): Promise<GT.HWND[]> {
     return new Promise((resolve, reject) => {
         if (!isWin32) {
             reject(plateformError);
             return;
         }
 
-        if ( ! task) {
+        if (!task) {
             return resolve([]);
         }
-        api.EnumWindows.async(enumWindowsProc, task.tno, err => {
+        user32.EnumWindows.async(enumWindowsProc, task.tno, (err: any) => {
             resolve(Array.from(task.hwndSet) || []);
         });
     });
@@ -249,51 +196,45 @@ function get_task_hwnd(task: Config.Task): Promise<number[]> {
 
 
 // get hWnd of main top-level window
-export function filter_main_hwnd(arr: number[]): number | void {
+export function filter_main_hwnd(arr: GT.HWND[]): GT.HWND[] | void {
     const res = new Set();
-    const map = new Map();
+    const ids = <Set<GT.HWND>> new Set();
+    // console.log('filter_main_hwnd:', arr.length, ref.address(arr[0]));
 
-    for (let hWnd of arr) {
-        const ownerHWnd = api.GetAncestor(hWnd, 3);
-        let count = map.get(ownerHWnd);
+    for (const hWnd of arr) {
+        // const ownerHWnd = user32.GetAncestor(hWnd, 3);
 
-        count = ! count ? 1 : count + 1;
-        map.set(ownerHWnd, count);
-    }
-
-    if (map.size === 1) {
-        const [hWnd] = map.keys();
-
-        return hWnd;
-    }
-    else if (map.size > 1) {
-        let max = 0;
-        let hWnd = 0;
-
-        for (let [k, v] of map) {
-            if (v > max) {
-                max = v;
-                hWnd = k;
-            }
+        // if (! ownerHWnd || ref.isNull(ownerHWnd) || ref.address(ownerHWnd) === ref.address(hWnd)) {  // hWnd is top window
+        //     ids.add(hWnd);
+        // }
+        if (is_main_window(hWnd)) {
+            ids.add(hWnd);
         }
+    }
 
-        return hWnd;
+    if (ids.size === 1) {
+        const [hWnd] = ids.keys();
+
+        return [hWnd];
+    }
+    else if (ids.size > 1) {
+        return [...ids.keys()];
     }
 }
 
-// check hWnd is top-level window
-export function is_main_window(hWnd: number): boolean {
-    const res = api.GetParent(hWnd);
+// check hWnd is own window not child window
+export function is_main_window(hWnd: GT.HWND): GT.BOOLEAN {
+    const p = user32.GetParent(hWnd);
 
-    return res === null || res === 0 ? true : false;
+    return !p || ref.isNull(p) ? true : false;
 }
 
 export function create_task(): Config.Task {
     const tno = ++taskConfig.tno;
     const task: Config.Task = {
         tno,
-        pid: 0,
-        title: '',
+        matchType: null,
+        matchValue: '',
         hwndSet: new Set(),
         pidSet: new Set(),
     };

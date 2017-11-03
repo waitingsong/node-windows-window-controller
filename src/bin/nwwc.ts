@@ -42,6 +42,6 @@ if (!validate_cmdshow(status)) {
     process.exit(1);
 }
 
-const errcode = showWindow(hWnd, status);
-
-process.exit(errcode);
+showWindow(hWnd, status).then((errcode) => {
+    process.exit(errcode);
+});
