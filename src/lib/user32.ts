@@ -20,10 +20,9 @@ export const taskConfig: TaskConfig = {
 };
 
 
-// stop loop if return false
 export const enumWindowsProc = ffi.Callback(
     W.BOOL, [W.HWND, W.LPARAM],
-    (hWnd: GT.HWND, lParam: GT.LPARAM): boolean => {
+    (hWnd: GT.HWND, lParam: GT.LPARAM): boolean => { // stop loop if return false
         const task = taskConfig.task.get(<number> lParam);
 
         if (!task) {
