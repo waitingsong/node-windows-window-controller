@@ -10,16 +10,19 @@
 
 import * as ffi from 'ffi';
 import * as ref from 'ref';
+import * as Win from 'win32-api';
 import {K, U, types as GT} from 'win32-api';
 import * as Config from './lib/types';
 import * as u32 from './lib/user32';
 
+export {Win};
 export {ExecRet} from './lib/types';
 export {validate_cmdshow} from './lib/user32';
 
 const isWin32: boolean = process.platform === 'win32';
 const plateformError = 'Invalid platform: win32 required';
 const user32 = U.load();
+
 
 // expose original user32.ShowWindow() as default
 export default function showWindow(hwnd: Config.Hwnd, nCmdShow: U.constants.CmdShow): Promise<Config.ErrCode> {
