@@ -60,7 +60,7 @@
   },
   "homepage": "https://github.com/waitingsong/node-windows-window-controller#readme",
   "engines": {
-    "node": ">=6.5.0"
+    "node": ">=8.0.0"
   },
   "os": [
     "win32"
