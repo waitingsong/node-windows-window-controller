@@ -37,9 +37,9 @@ export default function showWindow(hwnd: Config.Hwnd, nCmdShow: U.constants.CmdS
     }
 
     return retrieve_pointer_by_hwnd(hwnd)
-        .then((arr) => {
-            if (arr && arr.length && !ref.isNull(arr[0])) {
-                if (user32.ShowWindow(arr[0], nCmdShow)) {
+        .then(hWnd => {
+            if (hWnd && ! ref.isNull(hWnd)) {
+                if (user32.ShowWindow(hWnd, nCmdShow)) {
                     errcode = 0;
                 }
             }
@@ -165,9 +165,14 @@ function init_execret(): Config.ExecRet {
 }
 
 // retrive hWnd buffer from decimal/hex value of hWnd
-export function retrieve_pointer_by_hwnd(hwnd: Config.Hwnd): Promise<void | GT.HWND[]> {
+export function retrieve_pointer_by_hwnd(hwnd: Config.Hwnd): Promise<void | GT.HWND> {
     const task = u32.create_task();
 
     task.matchType = 'hwnd';
-    return u32.get_hwnds(hwnd, task);
+    return u32.get_hwnds(hwnd, task)
+        .then(arr => {
+            if (arr && arr.length) {
+                return arr[0];
+            }
+        });
 }
