@@ -1,6 +1,12 @@
 # windows-window-controller
 Wrap user32.ShowWindow() by node via [node-ffi](https://github.com/node-ffi/node-ffi)
 
+[![Version](https://img.shields.io/npm/v/win32-api.svg)](https://www.npmjs.com/package/windows-window-controller)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
+![Available platform](https://img.shields.io/badge/platform-win32-blue.svg)
+[![Build status](https://ci.appveyor.com/api/projects/status/jh6io0q3wbo9s88r?svg=true)](https://ci.appveyor.com/project/waitingsong/node-windows-window-controller)
+[![Coverage Status](https://coveralls.io/repos/github/waitingsong/node-windows-window-controller/badge.svg)](https://coveralls.io/github/waitingsong/node-windows-window-controller)
+
 ## What can I do with this?
 Hide, show, maximize, minimize a window where you know either the app process PID, or window's hWnd, or keyword title of the window(s).
 
@@ -25,17 +31,17 @@ hide-window --pid=30258
 # by keyword of title case sensitive
 hide-window --title=vim
 
-# 3: Activates the window and displays it as a maximized window. 
+# 3: Activates the window and displays it as a maximized window.
 show-window --pid=0x7632 --status=3
 show-window --pid=30258 --status=3
 show-window --title=vim --status=3
 
 # ------  original user32.ShowWindow ------
-# 0: Hides the window and activates another window. 
+# 0: Hides the window and activates another window.
 nwwc --hwnd=0x702C6 --status=0
 nwwc --hwnd=459462 --status=0
 
-# 1: Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. An application should specify this flag when displaying the window for the first time. 
+# 1: Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. An application should specify this flag when displaying the window for the first time.
 nwwc --hwnd=0x702C6 --status=1
 
 
