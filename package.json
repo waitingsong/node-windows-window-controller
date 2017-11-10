@@ -31,6 +31,22 @@
     "minimize window",
     "隐藏窗口"
   ],
+  "nyc": {
+    "exclude": [
+      "**/*.js",
+      "**/*.test.ts",
+      "**/*.d.ts"
+    ],
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "all": true
+  },
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "author": "waiting",
@@ -67,6 +83,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
     "mocha-lcov-reporter": "^1.3.0",
+    "mz-modules": "^2.0.0",
     "nyc": "^11.3.0",
     "power-assert": "^1.4.4",
     "rimraf": "^2.6.2",
