@@ -50,16 +50,16 @@ export default function showWindow(hwnd: Config.Hwnd, nCmdShow: U.constants.CmdS
         });
 }
 
-export function hide(p: Config.matchParam, onlyMainWin: boolean = true): Promise<Config.ExecRet> {
-    return proxy(p, U.constants.CmdShow.SW_HIDE, onlyMainWin);
+export function hide(p: Config.matchParam, onlyTopWin: boolean = true): Promise<Config.ExecRet> {
+    return proxy(p, U.constants.CmdShow.SW_HIDE, onlyTopWin);
 }
 
-export function show(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyMainWin: boolean = true): Promise<Config.ExecRet> {
-    return proxy(p, nCmdShow, onlyMainWin);
+export function show(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyTopWin: boolean = true): Promise<Config.ExecRet> {
+    return proxy(p, nCmdShow, onlyTopWin);
 }
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx
-function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyMainWin: boolean): Promise<Config.ExecRet> {
+function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyTopWin: boolean): Promise<Config.ExecRet> {
     const execRet = init_execret();
 
     if ( ! u32.validate_cmdshow(nCmdShow)) {
@@ -68,51 +68,23 @@ function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyMainWin:
         return Promise.resolve(execRet);
     }
 
-    return new Promise(resolve => {
-        if (onlyMainWin) {
-            get_main_hwnd(p).then(hWnds => {
-                if (hWnds && hWnds.length) {
-                    for (const hWnd of hWnds) {
-                        if (hWnd && !ref.isNull(hWnd)) {
-                            // console.log('hWnd add:', ref.address(hWnd));
-                            u32.show(hWnd, nCmdShow, onlyMainWin)
-                                .then((hWnd) => {
-                                    hWnd && !ref.isNull(hWnd) && execRet.hwnds.push(ref.address(hWnd));
-                                })
-                                .catch(err => {
-                                    execRet.err = 1;
-                                    execRet.msg += '\n ' + err;
-                                })
-                                .then(() => {
-                                    resolve();
-                                });
-                        }
-                    }
-                }
-                else {
-                    resolve();
-                }
-            });
-        }
-        else {
-            get_hwnds(p).then(arr => {
-                if (arr && arr.length) {
-                    Promise.all(arr.map(hWnd => {
-                        return u32.show(hWnd, nCmdShow, onlyMainWin)
-                            .then((hWnd) => hWnd && execRet.hwnds.push(ref.address(hWnd)))
-                            .catch((err: any) => {
+    return get_hwnds(p, onlyTopWin).then(hWnds => {
+            if (hWnds && hWnds.length) {
+                for (const hWnd of hWnds) {
+                    if (hWnd && !ref.isNull(hWnd)) {
+                        // console.log('hWnd add:', ref.address(hWnd));
+                        u32.show(hWnd, nCmdShow, onlyTopWin)
+                            .then((hWnd) => hWnd && !ref.isNull(hWnd) && execRet.hwnds.push(ref.address(hWnd)))
+                            .catch(err => {
                                 execRet.err = 1;
                                 execRet.msg += '\n ' + err;
                             });
-                    }))
-                        .then(resolve);
+                    }
                 }
-                else {
-                    resolve();
-                }
-            });
-        }
-    }).then(() => execRet);
+            }
+        })
+        .then(() => execRet);
+
 }
 
 
@@ -125,8 +97,24 @@ export function get_main_hwnd(p: Config.matchParam): Promise<GT.HWND[] | void> {
 }
 
 
-export function get_hwnds(p: Config.matchParam): Promise<GT.HWND[] | void> {
-    return u32.get_hwnds(p);
+/**
+ * retrieve hWnds by matchValue matched by pid|title
+ * all: true means all matched window include child,
+ * all: false means only top or owner window
+ */
+export function get_hwnds(p: Config.matchParam, onlyTopWin?: boolean): Promise<GT.HWND[] | void> {
+    if ( ! onlyTopWin) {
+        return u32.get_hwnds(p);
+    }
+    else {
+        return u32.get_hwnds(p)
+            .then((arr: GT.HWND[] | void) => {
+                if (arr && Array.isArray(arr) && arr.length) {
+                    return u32.filter_main_hwnd(arr);
+                }
+
+            });
+    }
 }
 
 
