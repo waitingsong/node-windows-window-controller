@@ -88,15 +88,6 @@ function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyTopWin: 
 }
 
 
-export function get_main_hwnd(p: Config.matchParam): Promise<GT.HWND[] | void> {
-    return get_hwnds(p).then((arr: GT.HWND[] | void) => {
-        if (arr && Array.isArray(arr) && arr.length) {
-            return u32.filter_main_hwnd(arr);
-        }
-    });
-}
-
-
 /**
  * retrieve hWnds by matchValue matched by pid|title
  * all: true means all matched window include child,
