@@ -222,7 +222,10 @@ export function filter_main_hwnd(arr: GT.HWND[]): GT.HWND[] | void {
     }
 }
 
-// check hWnd is own window not child window
+/**
+ * filter none top-level window
+ * NOTE: not accurate, IME, MESSAGE windows not be filtered out
+ */
 export function is_main_window(hWnd: GT.HWND): GT.BOOLEAN {
     const p = user32.GetParent(hWnd);
 
