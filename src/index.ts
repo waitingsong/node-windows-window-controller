@@ -76,7 +76,7 @@ function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyTopWin: 
             if (hWnds && hWnds.length) {
                 for (const hWnd of hWnds) {
                     if (hWnd && !ref.isNull(hWnd)) {
-                        // console.log('hWnd add:', ref.address(hWnd));
+                        // console.log('hWnd addr:', ref.address(hWnd));
                         u32.show(hWnd, nCmdShow, onlyTopWin)
                             .then((hWnd) => hWnd && !ref.isNull(hWnd) && execRet.hwnds.push(ref.address(hWnd)))
                             .catch(err => {
@@ -87,8 +87,11 @@ function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyTopWin: 
                 }
             }
         })
+        .catch(err => {
+            execRet.err = 1;
+            execRet.msg += err.toString();
+        })
         .then(() => execRet);
-
 }
 
 
