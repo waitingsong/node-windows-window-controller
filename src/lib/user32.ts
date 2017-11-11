@@ -212,14 +212,7 @@ export function filter_main_hwnd(arr: GT.HWND[]): GT.HWND[] | void {
         }
     }
 
-    if (ids.size === 1) {
-        const [hWnd] = ids.keys();
-
-        return [hWnd];
-    }
-    else if (ids.size > 1) {
-        return [...ids.keys()];
-    }
+    return [...ids.keys()];
 }
 
 /**
