@@ -25,7 +25,7 @@ test_script:
   - node --version
   - npm --version
   - npm run build:ts
-  = npm run jslint
+  - npm run jslint
 
 on_success:
   - npm run cov:coveralls
