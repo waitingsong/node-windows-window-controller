@@ -14,7 +14,7 @@ const Win = nwwc.Win;
 const knl32 = Win.Kernel32.load();
 const user32 = Win.User32.load();
 const title = 'Node-Calculator';
-const waitTimeStart = '5s';
+const waitTimeLong = '5s';
 const waitTime = '3s';
 
 describe(filename, () => {
@@ -25,7 +25,7 @@ describe(filename, () => {
         beforeEach(async () => {
             child && child.kill();
             child = spawn('calc.exe');
-            await sleep(waitTimeStart);
+            await sleep(waitTimeLong);
             hWnd = find_n_check_calc_win();
             assert(user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             change_title(hWnd, title);
@@ -51,7 +51,7 @@ describe(filename, () => {
         beforeEach(async () => {
             child && child.kill();
             child = spawn('calc.exe');
-            await sleep(waitTimeStart);
+            await sleep(waitTimeLong);
             hWnd = find_n_check_calc_win();
             assert(user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             change_title(hWnd, title);
@@ -78,7 +78,7 @@ describe(filename, () => {
         beforeEach(async () => {
             child && child.kill();
             child = spawn('calc.exe');
-            await sleep(waitTimeStart);
+            await sleep(waitTimeLong);
             hWnd = find_n_check_calc_win();
             assert(user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             change_title(hWnd, title);
@@ -123,7 +123,7 @@ describe(filename, () => {
         beforeEach(async () => {
             child && child.kill();
             child = spawn('calc.exe');
-            await sleep(waitTimeStart);
+            await sleep(waitTimeLong);
             hWnd = find_n_check_calc_win();
             assert(user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             change_title(hWnd, title);
