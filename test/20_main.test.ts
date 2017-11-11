@@ -14,8 +14,8 @@ const Win = nwwc.Win;
 const knl32 = Win.Kernel32.load();
 const user32 = Win.User32.load();
 const title = 'Node-Calculator';
-const waitTimeStart = '4s';
-const waitTime = '1s';
+const waitTimeStart = '5s';
+const waitTime = '3s';
 
 describe(filename, () => {
     let child: ChildProcess;
