@@ -27,9 +27,13 @@ const user32 = U.load();
 // expose original user32.ShowWindow() as default
 export default function showWindow(hwnd: Config.Hwnd, nCmdShow: U.constants.CmdShow): Promise<Config.ErrCode> {
     let errcode = 1;
+    hwnd = +hwnd;
 
-    if ( ! Number.isSafeInteger(hwnd)) {
+    if (typeof hwnd !== 'number' || ! Number.isSafeInteger(hwnd)) {
         console.error('hwnd must integer');
+        return Promise.resolve(errcode);
+    }
+    if (hwnd <= 0) {
         return Promise.resolve(errcode);
     }
     if ( ! u32.validate_cmdshow(nCmdShow)) {
