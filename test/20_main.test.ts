@@ -14,8 +14,8 @@ const Win = nwwc.Win;
 const knl32 = Win.Kernel32.load();
 const user32 = Win.User32.load();
 const title = 'Node-Calculator';
-const waitTimeLong = '5s';
-const waitTime = '3s';
+const waitTimeLong = '4s';
+const waitTime = '1s';
 
 describe(filename, () => {
     let child: ChildProcess;
@@ -32,18 +32,18 @@ describe(filename, () => {
             await sleep(waitTime);
         });
         afterEach(async () => {
-            await sleep(waitTime);
+            await sleep(waitTimeLong);
             assert(!user32.IsWindowVisible(hWnd), 'afterEach: window should invisible');
             child && child.kill();
             await sleep(waitTime);
         });
 
-        it('--pid', function() {
-            nwwc.hide(child.pid);
+        it('--pid', function(done) {
+            nwwc.hide(child.pid).then(() => done());
         });
 
-        it('--title', function() {
-            nwwc.hide(title);
+        it('--title', function(done) {
+            nwwc.hide(title).then(() => done());
         });
     });
 
@@ -55,22 +55,22 @@ describe(filename, () => {
             hWnd = find_n_check_calc_win();
             assert(user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             change_title(hWnd, title);
-            nwwc.hide(child.pid);
+            await nwwc.hide(child.pid);
             await sleep(waitTime);
         });
         afterEach(async () => {
-            await sleep(waitTime);
+            await sleep(waitTimeLong);
             assert(user32.IsWindowVisible(hWnd), 'afterEach: window should visible');
             child && child.kill();
             await sleep(waitTime);
         });
 
-        it('--pid', function() {
-            nwwc.show(child.pid, 9);
+        it('--pid', function(done) {
+            nwwc.show(child.pid, 9).then(() => done());
         });
 
-        it('--title', function() {
-            nwwc.show(title, 9);
+        it('--title', function(done) {
+            nwwc.show(title, 9).then(() => done());
         });
     });
 
@@ -90,31 +90,34 @@ describe(filename, () => {
         });
 
         it('restore by valid hWndDec', async function() {
-            nwwc.hide(child.pid);
+            await nwwc.hide(child.pid);
             await sleep(waitTime);
-            nwwc.default(ref.address(hWnd), 9);
-            await sleep(waitTime);
-            assert(user32.IsWindowVisible(hWnd), 'window should visible');
+            await nwwc.default(ref.address(hWnd), 9).then(async () => {
+                await sleep(waitTime);
+                assert(user32.IsWindowVisible(hWnd), 'window should visible');
+            });
         });
 
         it('restore by invalid hWndDec', async function() {
-            nwwc.hide(child.pid);
+            await nwwc.hide(child.pid);
             await sleep(waitTime);
-            nwwc.default(0, 9);
-            await sleep(waitTime);
-            assert(! user32.IsWindowVisible(hWnd), 'window should invisible');
+            await nwwc.default(0, 9).then(async () => {
+                await sleep(waitTime);
+                assert(! user32.IsWindowVisible(hWnd), 'window should invisible');
+            });
         });
 
         it('hide by valid hWndDec', async function() {
-            nwwc.default(ref.address(hWnd), 0);
-            await sleep(waitTime);
-            assert( ! user32.IsWindowVisible(hWnd), 'window should invisible');
+            await nwwc.default(ref.address(hWnd), 0).then(async () => {
+                await sleep(waitTime);
+                assert( ! user32.IsWindowVisible(hWnd), 'window should invisible');
+            });
         });
 
         it('hide by invalid hWndDec', async function() {
-            nwwc.default(0, 0);
-            await sleep(waitTime);
-            assert(user32.IsWindowVisible(hWnd), 'window should invisible now');
+            await nwwc.default(0, 0).then(() => {
+                assert(user32.IsWindowVisible(hWnd), 'window should invisible now');
+            });
         });
     });
 
