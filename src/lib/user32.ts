@@ -235,9 +235,24 @@ export function filter_main_hwnd(arr: GT.HWND[]): GT.HWND[] | void {
  * NOTE: not accurate, IME, MESSAGE windows not be filtered out
  */
 export function is_main_window(hWnd: GT.HWND): GT.BOOLEAN {
-    const p = user32.GetParent(hWnd);
+    let p = user32.GetParent(hWnd);
 
-    return !p || ref.isNull(p) ? true : false;
+    if ( ! ref.isNull(p)) {
+        return false;
+    }
+    p = user32.GetWindow(hWnd, 4);  // GW_OWNER==4
+    if ( ! ref.isNull(p)) {
+        return false;
+    }
+    const buf = Buffer.alloc(100);
+    user32.GetWindowTextW(hWnd, buf, 50);
+
+    const title = ref.reinterpretUntilZeros(buf, 2).toString('ucs2');
+
+    if ( ! title || ! title.trim()) {
+        return false;
+    }
+    return true;
 }
 
 export function create_task(): Config.Task {
