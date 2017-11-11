@@ -69,6 +69,8 @@ Check out [node-gyp](https://github.com/nodejs/node-gyp) and [windows-build-tool
 - [Windows Api ShowWindow documentation](https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548%28v=vs.85%29.aspx)
 
 
+## Known bugs:
+- The result of find hWnds by pid is empty when build by VS2017. It works when VS2013 and VS2015.
 
 ## License
 [MIT](LICENSE)
