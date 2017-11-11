@@ -13,8 +13,9 @@ const filename = basename(__filename);
 const Win = nwwc.Win;
 const knl32 = Win.Kernel32.load();
 const user32 = Win.User32.load();
-const waitTime = '2s';
 const title = 'Node-Calculator';
+const waitTimeStart = '4s';
+const waitTime = '1s';
 
 describe(filename, () => {
     let child: ChildProcess;
@@ -24,7 +25,7 @@ describe(filename, () => {
         beforeEach(async () => {
             child && child.kill();
             child = spawn('calc.exe');
-            await sleep(waitTime);
+            await sleep(waitTimeStart);
             hWnd = find_n_check_calc_win();
             assert(user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             change_title(hWnd, title);
@@ -34,6 +35,7 @@ describe(filename, () => {
             await sleep(waitTime);
             assert(!user32.IsWindowVisible(hWnd), 'afterEach: window should invisible');
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('--pid', function() {
@@ -49,7 +51,7 @@ describe(filename, () => {
         beforeEach(async () => {
             child && child.kill();
             child = spawn('calc.exe');
-            await sleep(waitTime);
+            await sleep(waitTimeStart);
             hWnd = find_n_check_calc_win();
             assert(user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             change_title(hWnd, title);
@@ -60,6 +62,7 @@ describe(filename, () => {
             await sleep(waitTime);
             assert(user32.IsWindowVisible(hWnd), 'afterEach: window should visible');
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('--pid', function() {
@@ -75,7 +78,7 @@ describe(filename, () => {
         beforeEach(async () => {
             child && child.kill();
             child = spawn('calc.exe');
-            await sleep(waitTime);
+            await sleep(waitTimeStart);
             hWnd = find_n_check_calc_win();
             assert(user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             change_title(hWnd, title);
@@ -83,6 +86,7 @@ describe(filename, () => {
         });
         afterEach(async () => {
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('restore by valid hWndDec', async function() {
@@ -119,15 +123,15 @@ describe(filename, () => {
         beforeEach(async () => {
             child && child.kill();
             child = spawn('calc.exe');
-            await sleep(waitTime);
+            await sleep(waitTimeStart);
             hWnd = find_n_check_calc_win();
             assert(user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             change_title(hWnd, title);
             await sleep(waitTime);
         });
         afterEach(async () => {
-            await sleep(waitTime);
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('by valid hWndDec', async function() {
