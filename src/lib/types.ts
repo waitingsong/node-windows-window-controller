@@ -9,6 +9,7 @@ export interface Task {
     pidSet: Set<GT.PID>;   // result dec[]
     matchType: 'pid' | 'title' | 'hwnd' | null;    // hwnd is dec/hex value, not hWnd buf
     matchValue: string | number;
+    errMsg: string;
 }
 
 export type ErrCode = number; // 0: no error

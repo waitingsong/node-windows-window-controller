@@ -26,6 +26,7 @@ export const enumWindowsProc = ffi.Callback(
         const task = taskConfig.task.get(<number> lParam);
 
         if (!task) {
+            console.error('enumWindowsProc() task not exists');
             return true;
         }
 
@@ -33,28 +34,38 @@ export const enumWindowsProc = ffi.Callback(
             case 'pid': {
                 const buf = ref.alloc(W.HINSTANCE);
 
-                user32.GetWindowThreadProcessId(hWnd, buf);
-                const pid = buf.readUInt32LE(0);
+                try {
+                    user32.GetWindowThreadProcessId(hWnd, buf);
+                    const pid = buf.readUInt32LE(0);
 
-                if (pid && pid === task.matchValue) {
-                    task.hwndSet.add(hWnd);
+                    if (pid && pid === task.matchValue) {
+                        task.hwndSet.add(hWnd);
+                    }
+                }
+                catch (ex) {
+                    task.errMsg += ',' + ex;
                 }
                 break;
             }
 
             case 'title':
                 if (task.matchValue) {
-                    const buf = Buffer.alloc(254);
-                    const ret = user32.GetWindowTextW(hWnd, buf, 254);
-                    const name = buf.toString('ucs2');
-                    // const visible = user32.IsWindowVisible(hWnd);
+                    try {
+                        const buf = Buffer.alloc(254);
+                        const ret = user32.GetWindowTextW(hWnd, buf, 254);
+                        const name = buf.toString('ucs2');
+                        // const visible = user32.IsWindowVisible(hWnd);
 
-                    if (name.indexOf(<string> task.matchValue) !== -1) {
-                        const buf = Buffer.alloc(4);
+                        if (name.indexOf(<string> task.matchValue) !== -1) {
+                            const buf = Buffer.alloc(4);
 
-                        user32.GetWindowThreadProcessId(hWnd, buf);
-                        task.pidSet.add(buf.readUIntLE(0, 4));
-                        task.hwndSet.add(hWnd);
+                            user32.GetWindowThreadProcessId(hWnd, buf);
+                            task.pidSet.add(buf.readUIntLE(0, 4));
+                            task.hwndSet.add(hWnd);
+                        }
+                    }
+                    catch (ex) {
+                        task.errMsg += ',' + ex;
                     }
                 }
                 else {  // all
@@ -126,7 +137,7 @@ export function get_hwnds(p: Config.matchParam, task?: Config.Task): Promise<GT.
             t = setTimeout(() => {
                 console.error('timeout failed');
                 resolve();
-            }, 10000); // @HARDCOD
+            }, 30000); // @HARDCOD
         }),
         _get_hwnds(task),
     ]).then((res: void | GT.HWND[]) => {
@@ -183,16 +194,19 @@ function get_task_hwnd(task: Config.Task): Promise<GT.HWND[]> {
             reject(plateformError);
             return;
         }
-
         if (!task) {
-            return resolve([]);
+            resolve([]);
+            return;
         }
         user32.EnumWindows.async(enumWindowsProc, task.tno, (err: any) => {
+            // console.log('get_task_hwnd size:', task.hwndSet.size);
+            if (task.errMsg) {
+                console.error(task.errMsg);
+            }
             resolve(Array.from(task.hwndSet) || []);
         });
     });
 }
-
 
 
 // get hWnd of main top-level window
@@ -212,6 +226,7 @@ export function filter_main_hwnd(arr: GT.HWND[]): GT.HWND[] | void {
         }
     }
 
+    // console.log('filter_main_hwnd return size', ids.size);
     return [...ids.keys()];
 }
 
@@ -233,6 +248,7 @@ export function create_task(): Config.Task {
         matchValue: '',
         hwndSet: new Set(),
         pidSet: new Set(),
+        errMsg: '',
     };
 
     taskConfig.task.set(tno, task);
