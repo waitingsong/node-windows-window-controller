@@ -1,7 +1,7 @@
 # windows-window-controller
 Wrap user32.ShowWindow() by node via [node-ffi](https://github.com/node-ffi/node-ffi)
 
-[![Version](https://img.shields.io/npm/v/win32-api.svg)](https://www.npmjs.com/package/windows-window-controller)
+[![Version](https://img.shields.io/npm/v/windows-window-controller.svg)](https://www.npmjs.com/package/windows-window-controller)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](http://opensource.org/licenses/MIT)
 ![Available platform](https://img.shields.io/badge/platform-win32-blue.svg)
 [![Build status](https://ci.appveyor.com/api/projects/status/jh6io0q3wbo9s88r?svg=true)](https://ci.appveyor.com/project/waitingsong/node-windows-window-controller)
