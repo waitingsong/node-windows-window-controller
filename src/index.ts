@@ -54,16 +54,18 @@ export default function showWindow(hwnd: Config.Hwnd, nCmdShow: U.constants.CmdS
         });
 }
 
-export function hide(p: Config.matchParam, onlyTopWin: boolean = true): Promise<Config.ExecRet> {
-    return proxy(p, U.constants.CmdShow.SW_HIDE, onlyTopWin);
+export function hide(p: Config.matchParam, filterWinRules?: Config.FilterWinRules): Promise<Config.ExecRet> {
+    const rules = Object.assign({}, Config.filterWinRulesDefaults, filterWinRules);
+    return proxy(p, U.constants.CmdShow.SW_HIDE, rules);
 }
 
-export function show(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyTopWin: boolean = true): Promise<Config.ExecRet> {
-    return proxy(p, nCmdShow, onlyTopWin);
+export function show(p: Config.matchParam, nCmdShow: U.constants.CmdShow, filterWinRules?: Config.FilterWinRules): Promise<Config.ExecRet> {
+    const rules = Object.assign({}, Config.showFilterRulesDefaults, filterWinRules);
+    return proxy(p, nCmdShow, rules);
 }
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx
-function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyTopWin: boolean): Promise<Config.ExecRet> {
+function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, rules: Config.FilterWinRules): Promise<Config.ExecRet> {
     const execRet = init_execret();
 
     if ( ! u32.validate_cmdshow(nCmdShow)) {
@@ -72,14 +74,14 @@ function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyTopWin: 
         return Promise.resolve(execRet);
     }
 
-    return get_hwnds(p, onlyTopWin).then(hWnds => {
+    return get_hwnds(p, rules).then(hWnds => {
             if (hWnds && hWnds.length) {
                 for (const hWnd of hWnds) {
                     if (hWnd && !ref.isNull(hWnd)) {
                         // console.log('hWnd addr:', ref.address(hWnd));
-                        u32.show(hWnd, nCmdShow, onlyTopWin)
+                        u32.show_hide_one(hWnd, nCmdShow)
                             .then((hWnd) => hWnd && !ref.isNull(hWnd) && execRet.hwnds.push(ref.address(hWnd)))
-                            .catch(err => {
+                            .catch((err: Error) => {
                                 execRet.err = 1;
                                 execRet.msg += '\n ' + err;
                             });
@@ -97,20 +99,17 @@ function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, onlyTopWin: 
 
 /**
  * retrieve hWnds by matchValue matched by pid|title
- * all: true means all matched window include child,
- * all: false means only top or owner window
  */
-export function get_hwnds(p: Config.matchParam, onlyTopWin?: boolean): Promise<GT.HWND[] | void> {
-    if ( ! onlyTopWin) {
+export function get_hwnds(p: Config.matchParam, rules?: Config.FilterWinRules): Promise<GT.HWND[] | void> {
+    if ( ! rules) {
         return u32.get_hwnds(p);
     }
     else {
         return u32.get_hwnds(p)
             .then((arr: GT.HWND[] | void) => {
                 if (arr && Array.isArray(arr) && arr.length) {
-                    return u32.filter_main_hwnd(arr);
+                    return u32.filter_hwnd(arr, rules);
                 }
-
             });
     }
 }

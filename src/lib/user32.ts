@@ -97,15 +97,12 @@ export function validate_cmdshow(nCmdShow: U.constants.CmdShow): boolean {
 }
 
 
-export function show(hWnd: GT.HWND, nCmdShow: U.constants.CmdShow, onlyMainWin: GT.BOOLEAN): Promise<void | GT.HWND> {
+export function show_hide_one(hWnd: GT.HWND, nCmdShow: U.constants.CmdShow): Promise<void | GT.HWND> {
     return new Promise((resolve, reject) => {
-        if (onlyMainWin && !is_main_window(hWnd)) {
-            return resolve();
-        }
         nCmdShow = +nCmdShow;
 
         if (Number.isNaN(nCmdShow) || nCmdShow < 0) {
-            return reject('show() params nCmdShow invalid: ' + nCmdShow);
+            return reject('show_hide_one() params nCmdShow invalid: ' + nCmdShow);
         }
 
         if (nCmdShow === 0) {
@@ -210,33 +207,36 @@ function get_task_hwnd(task: Config.Task): Promise<GT.HWND[]> {
 
 
 // get hWnd of main top-level window
-export function filter_main_hwnd(arr: GT.HWND[]): GT.HWND[] | void {
-    const res = new Set();
-    const ids = <Set<GT.HWND>> new Set();
-    // console.log('filter_main_hwnd:', arr.length, ref.address(arr[0]));
-
-    for (const hWnd of arr) {
-        // const ownerHWnd = user32.GetAncestor(hWnd, 3);
-
-        // if (! ownerHWnd || ref.isNull(ownerHWnd) || ref.address(ownerHWnd) === ref.address(hWnd)) {  // hWnd is top window
-        //     ids.add(hWnd);
-        // }
-        if (is_main_window(hWnd)) {
-            ids.add(hWnd);
-        }
+export function filter_hwnd(arr: GT.HWND[], filterWinRules?: Config.FilterWinRules): GT.HWND[]{
+    if (typeof filterWinRules === 'undefined') {
+        return [...(new Set(arr).keys())];
     }
+    else {
+        const rules: Config.FilterWinRules = Object.assign({}, Config.filterWinRulesDefaults, filterWinRules);
+        const ids = <Set<GT.HWND>> new Set();
+        // console.log('filter_main_hwnd:', arr.length, ref.address(arr[0]));
 
-    // console.log('filter_main_hwnd return size', ids.size);
-    return [...ids.keys()];
+        for (const hWnd of arr) {
+            if (ids.has(hWnd)) {
+                continue;
+            }
+            if (_filter_hwnd(hWnd, rules)) {
+                ids.add(hWnd);
+            }
+        }
+        // console.log('filter_main_hwnd return size', ids.size);
+        return [...ids.keys()];
+    }
 }
 
 /**
  * filter none top-level window
  * NOTE: not accurate, IME, MESSAGE windows not be filtered out
  */
-export function is_main_window(hWnd: GT.HWND): GT.BOOLEAN {
+function _filter_hwnd(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BOOLEAN {
     let p = user32.GetParent(hWnd);
     // const addr = ref.address(hWnd);
+    //console.log('addr: ', addr + ':' + addr.toString(16));
 
     if ( ! ref.isNull(p)) {
         return false;
@@ -245,45 +245,76 @@ export function is_main_window(hWnd: GT.HWND): GT.BOOLEAN {
     if ( ! ref.isNull(p)) {
         return false;
     }
+
+    if ( ! validate_rule_title(hWnd, rules)) {
+        return false;
+    }
+    if ( ! validate_rule_style(hWnd, rules)) {
+        return false;
+    }
+    if ( ! validate_rule_exstyle(hWnd, rules)) {
+        return false;
+    }
+
+    return true;
+}
+
+function validate_rule_title(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BOOLEAN {
     const buf = Buffer.alloc(100);
     user32.GetWindowTextW(hWnd, buf, 50);
 
-    const title = ref.reinterpretUntilZeros(buf, 2).toString('ucs2');
+    let title = ref.reinterpretUntilZeros(buf, 2).toString('ucs2');
 
-    if ( ! title || ! title.trim()) {
-        return false;
+    title && (title = title.trim());
+
+    if (rules.titleExits) {
+        return title ? true : false;
     }
-    //console.log('addr: ', addr + ':' + addr.toString(16));
-    const WS_CHILD = 0x40000000;
-    const WS_POPUP = 0x80000000;    // The windows is a pop-up window
-    const WS_SYSMENU = 0x00080000;  // The window has a window menu on its title bar.
-    const WS_VISIBLE = 0x10000000;  // The window is initially visible
-    const dwStyle = GCF._WIN64 ? user32.GetWindowLongPtrW(hWnd, -16) : user32.GetWindowLongW(hWnd, -16);   // GWL_STYLE
+    else {
+        return title ? false : true;
+    }
+}
+
+function validate_rule_style(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BOOLEAN {
+    const dwStyle = user32.GetWindowLongPtrW(hWnd, -16);   // GWL_STYLE
     //console.log('style:', dwStyle);
 
-    if (dwStyle <= 0) {
-        return false;
-    }
-    if ((dwStyle | WS_CHILD) === dwStyle) {
-        return false;
-    }
-    if ((dwStyle | WS_SYSMENU) !== dwStyle) {
-        return false;
-    }
-    // if ((dwStyle | WS_VISIBLE) !== dwStyle) {
+    // if (dwStyle <= 0) {
     //     return false;
     // }
-
-    const WS_EX_TOOLWINDOW = 0x80;
-    const dwExStyle =  GCF._WIN64 ? user32.GetWindowLongPtrW(hWnd, -20) : user32.GetWindowLongW(hWnd, -20); // GWL_EXSTYLE
-    // console.log('dwExstyle:' + dwExStyle);
-
-    if (dwExStyle <= 0) {
-        return false;
+    if (rules.includeStyle && Number.isSafeInteger(rules.includeStyle)) {
+        if ((dwStyle | rules.includeStyle) !== dwStyle) {
+            return false;
+        }
+    }
+    if (rules.excludeStyle && Number.isSafeInteger(rules.excludeStyle)) {
+        if ((dwStyle | rules.excludeStyle) === dwStyle) {
+            return false;
+        }
     }
 
-    if (dwExStyle && ((dwExStyle | WS_EX_TOOLWINDOW) === dwExStyle)) {
-        return false;
+    return true;
+}
+
+function validate_rule_exstyle(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BOOLEAN {
+    const dwExStyle = user32.GetWindowLongPtrW(hWnd, -20); // GWL_EXSTYLE
+    // console.log('dwExstyle:' + dwExStyle);
+
+    // if (dwExStyle <= 0) {
+    //     return false;
+    // }
+    // if (dwExStyle && ((dwExStyle | WS_EX_TOOLWINDOW) === dwExStyle)) {
+    //     return false;
+    // }
+    if (rules.includeExStyle && Number.isSafeInteger(rules.includeExStyle)) {
+        if ((dwExStyle | rules.includeExStyle) !== dwExStyle) {
+            return false;
+        }
+    }
+    if (rules.excludeExStyle && Number.isSafeInteger(rules.excludeExStyle)) {
+        if ((dwExStyle | rules.excludeExStyle) === dwExStyle) {
+            return false;
+        }
     }
 
     return true;
