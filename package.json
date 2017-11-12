@@ -66,7 +66,7 @@
   ],
   "dependencies": {
     "ffi": "^2.2.0",
-    "win32-api": "^1.6.2"
+    "win32-api": "^1.9.1"
   },
   "devDependencies": {
     "@types/ffi": "^0.0.19",
