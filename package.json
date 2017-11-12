@@ -1,6 +1,6 @@
 {
   "name": "windows-window-controller",
-  "version": "2.3.1",
+  "version": "2.3.2",
   "description": "controll window by calling user32.ShowWindow from node via node-ffi",
   "main": "./dist/index.js",
   "bin": {
