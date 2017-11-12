@@ -236,6 +236,7 @@ export function filter_main_hwnd(arr: GT.HWND[]): GT.HWND[] | void {
  */
 export function is_main_window(hWnd: GT.HWND): GT.BOOLEAN {
     let p = user32.GetParent(hWnd);
+    // const addr = ref.address(hWnd);
 
     if ( ! ref.isNull(p)) {
         return false;
@@ -252,6 +253,39 @@ export function is_main_window(hWnd: GT.HWND): GT.BOOLEAN {
     if ( ! title || ! title.trim()) {
         return false;
     }
+    //console.log('addr: ', addr + ':' + addr.toString(16));
+    const WS_CHILD = 0x40000000;
+    const WS_POPUP = 0x80000000;    // The windows is a pop-up window
+    const WS_SYSMENU = 0x00080000;  // The window has a window menu on its title bar.
+    const WS_VISIBLE = 0x10000000;  // The window is initially visible
+    const dwStyle = user32.GetWindowLongPtrW(hWnd, -16);   // GWL_STYLE
+    //console.log('style:', dwStyle);
+
+    if (dwStyle <= 0) {
+        return false;
+    }
+    if ((dwStyle | WS_CHILD) === dwStyle) {
+        return false;
+    }
+    if ((dwStyle | WS_SYSMENU) !== dwStyle) {
+        return false;
+    }
+    // if ((dwStyle | WS_VISIBLE) !== dwStyle) {
+    //     return false;
+    // }
+
+    const WS_EX_TOOLWINDOW = 0x80;
+    const dwExStyle = user32.GetWindowLongPtrW(hWnd, -20); // GWL_EXSTYLE
+    // console.log('dwExstyle:' + dwExStyle);
+
+    if (dwExStyle <= 0) {
+        return false;
+    }
+
+    if (dwExStyle && ((dwExStyle | WS_EX_TOOLWINDOW) === dwExStyle)) {
+        return false;
+    }
+
     return true;
 }
 
