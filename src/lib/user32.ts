@@ -258,7 +258,7 @@ export function is_main_window(hWnd: GT.HWND): GT.BOOLEAN {
     const WS_POPUP = 0x80000000;    // The windows is a pop-up window
     const WS_SYSMENU = 0x00080000;  // The window has a window menu on its title bar.
     const WS_VISIBLE = 0x10000000;  // The window is initially visible
-    const dwStyle = user32.GetWindowLongPtrW(hWnd, -16);   // GWL_STYLE
+    const dwStyle = GCF._WIN64 ? user32.GetWindowLongPtrW(hWnd, -16) : user32.GetWindowLongW(hWnd, -16);   // GWL_STYLE
     //console.log('style:', dwStyle);
 
     if (dwStyle <= 0) {
@@ -275,7 +275,7 @@ export function is_main_window(hWnd: GT.HWND): GT.BOOLEAN {
     // }
 
     const WS_EX_TOOLWINDOW = 0x80;
-    const dwExStyle = user32.GetWindowLongPtrW(hWnd, -20); // GWL_EXSTYLE
+    const dwExStyle =  GCF._WIN64 ? user32.GetWindowLongPtrW(hWnd, -20) : user32.GetWindowLongW(hWnd, -20); // GWL_EXSTYLE
     // console.log('dwExstyle:' + dwExStyle);
 
     if (dwExStyle <= 0) {
