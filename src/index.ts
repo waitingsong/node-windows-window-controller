@@ -55,12 +55,17 @@ export default function showWindow(hwnd: Config.Hwnd, nCmdShow: U.constants.CmdS
 }
 
 export function hide(p: Config.matchParam, filterWinRules?: Config.FilterWinRules): Promise<Config.ExecRet> {
-    const rules = Object.assign({}, Config.filterWinRulesDefaults, filterWinRules);
+    const rules: Config.FilterWinRules = Object.assign({}, Config.filterWinRulesDefaults, filterWinRules);
     return proxy(p, U.constants.CmdShow.SW_HIDE, rules);
 }
 
 export function show(p: Config.matchParam, nCmdShow: U.constants.CmdShow, filterWinRules?: Config.FilterWinRules): Promise<Config.ExecRet> {
-    const rules = Object.assign({}, Config.showFilterRulesDefaults, filterWinRules);
+    const rules: Config.FilterWinRules = Object.assign({}, Config.showFilterRulesDefaults, filterWinRules);
+
+    if ( ! filterWinRules || (filterWinRules.titleExits === null || typeof filterWinRules.titleExits !== 'boolean')) {
+        rules.titleExits = true;
+    }
+
     return proxy(p, nCmdShow, rules);
 }
 
@@ -101,6 +106,7 @@ function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, rules: Confi
  * retrieve hWnds by matchValue matched by pid|title
  */
 export function get_hwnds(p: Config.matchParam, rules?: Config.FilterWinRules): Promise<GT.HWND[] | void> {
+    // console.log('rules:', rules, 'p:', p);
     if ( ! rules) {
         return u32.get_hwnds(p);
     }

@@ -39,6 +39,7 @@ export const enumWindowsProc = ffi.Callback(
                     const pid = buf.readUInt32LE(0);
 
                     if (pid && pid === task.matchValue) {
+                        // console.log('got by pid:', pid, 'hWnd:' + ref.address(hWnd), ref.address(hWnd).toString(16));
                         task.hwndSet.add(hWnd);
                     }
                 }
@@ -100,6 +101,7 @@ export function validate_cmdshow(nCmdShow: U.constants.CmdShow): boolean {
 export function show_hide_one(hWnd: GT.HWND, nCmdShow: U.constants.CmdShow): Promise<void | GT.HWND> {
     return new Promise((resolve, reject) => {
         nCmdShow = +nCmdShow;
+        // console.log('show_hide_one: ' + ref.address(hWnd) + ', cmd:' + nCmdShow);
 
         if (Number.isNaN(nCmdShow) || nCmdShow < 0) {
             return reject('show_hide_one() params nCmdShow invalid: ' + nCmdShow);
@@ -266,13 +268,14 @@ function validate_rule_title(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BO
     let title = ref.reinterpretUntilZeros(buf, 2).toString('ucs2');
 
     title && (title = title.trim());
-
-    if (rules.titleExits) {
+    if (rules.titleExits === true) {
         return title ? true : false;
     }
-    else {
+    else if (rules.titleExits === false) {
         return title ? false : true;
     }
+
+    return true;    // 'ignore'
 }
 
 function validate_rule_style(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BOOLEAN {

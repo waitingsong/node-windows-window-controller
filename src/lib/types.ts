@@ -22,14 +22,14 @@ export interface ExecRet {
 }
 
 export interface FilterWinRules {
-    titleExits: boolean;  // default true
+    titleExits: boolean | null;  // default null means 'ignore'
     includeStyle?: number | null;
     excludeStyle?: number | null;
     includeExStyle?: number | null;
     excludeExStyle?: number | null;
 }
 export const filterWinRulesDefaults = {
-    titleExits: false,
+    titleExits: null,
     includeStyle: null,
     excludeStyle: null,
     includeExStyle: null,
