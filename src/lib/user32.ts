@@ -6,9 +6,6 @@ import * as H from './helper';
 
 const user32 = U.load();
 
-const isWin32: boolean = process.platform === 'win32';
-const plateformError = 'Invalid platform: win32 required';
-
 
 export interface TaskConfig {
     tno: Config.Tno;
@@ -182,10 +179,6 @@ function _get_hwnds(task: Config.Task): Promise<GT.HWND[] | void> {
 
 function get_task_hwnd(task: Config.Task): Promise<GT.HWND[]> {
     return new Promise((resolve, reject) => {
-        if (!isWin32) {
-            reject(plateformError);
-            return;
-        }
         if (!task) {
             resolve([]);
             return;
