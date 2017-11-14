@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
 /**
+ * show or hide window(s)
  * arguments:
- * --pid={integer} --status={nCmdShow}
- * --title={string} --status={nCmdShow}
+ * --pid={integer}
+ * --title={string}
+ * --hwnd={integer}
+ * --status={nCmdShow}
  */
 
 import * as yargs from 'yargs';
@@ -12,7 +15,7 @@ import * as nwwc from '../index';
 const opts = nwwc.parse_cli_opts(yargs.argv);
 
 if (! opts) {
-    console.error('argv empty. options: --pid --status or --title --status');
+    console.error('argv empty. options: --pid|title|hwnd --status');
     console.log('status value See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx');
     process.exit(1);
 }

@@ -3,8 +3,9 @@
 /**
  * kill process by which the matched hWnd(s) (window) created
  * optins:
- * --pid={number}
+ * --pid={integer}
  * --title={string}
+ * --hwnd={integer}
  */
 
 import * as yargs from 'yargs';
