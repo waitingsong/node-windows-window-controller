@@ -219,7 +219,6 @@ describe(filename, () => {
             opts.nCmdShow = 0;
             const execRet = await nwwc.hide(opts);
 
-            await sleep(waitTime);
             assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
         });
         it('--hwnd by invalid value', async function() {

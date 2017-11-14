@@ -54,7 +54,6 @@ describe(filename, () => {
                 if (!execRet.hwnds.length) {
                     assert(false, 'processed hWnds should not empty');
                 }
-                await sleep(waitTime);
                 assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
             }
             catch (ex) {
@@ -73,7 +72,6 @@ describe(filename, () => {
                 if (!execRet.hwnds.length) {
                     assert(false, 'processed hWnds should not empty');
                 }
-                await sleep(waitTime);
                 assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
             }
             catch (ex) {
@@ -90,7 +88,6 @@ describe(filename, () => {
                 const execRet = await nwwc.show(opts);
 
                 H.assert_execret(execRet);
-                await sleep(waitTime);
                 assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
             }
             catch (ex) {
@@ -105,7 +102,6 @@ describe(filename, () => {
             try {
                 const execRet = await nwwc.show(opts);
 
-                await sleep(waitTime);
                 assert(user32.IsWindowVisible(hWnd), 'window should visible');
             }
             catch (ex) {
@@ -124,7 +120,6 @@ describe(filename, () => {
                 if (!execRet.hwnds.length) {
                     assert(false, 'processed hWnds should not empty');
                 }
-                await sleep(waitTime);
                 assert(user32.IsWindowVisible(hWnd), 'window should visible');
             }
             catch (ex) {
@@ -144,7 +139,6 @@ describe(filename, () => {
                 // if (execRet.hwnds.length) {
                 //     assert(false, 'processed hWnds should empty');
                 // }
-                await sleep(waitTime);
                 assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
             }
             catch (ex) {
@@ -161,7 +155,6 @@ describe(filename, () => {
                 const execRet = await nwwc.show(opts);
 
                 H.assert_execret(execRet);
-                await sleep(waitTime);
                 assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
             }
             catch (ex) {
@@ -176,7 +169,6 @@ describe(filename, () => {
             try {
                 const execRet = await nwwc.show(opts);
 
-                await sleep(waitTime);
                 assert(user32.IsWindowVisible(hWnd), 'window should visible');
             }
             catch (ex) {
@@ -193,7 +185,6 @@ describe(filename, () => {
             opts.nCmdShow = 2;
             const execRet = await nwwc.show(opts);
 
-            await sleep(waitTime);
             assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
         });
         it('--hwnd by invalid value', async function() {
@@ -217,7 +208,6 @@ describe(filename, () => {
             if (!execRet.hwnds.length) {
                 assert(false, 'processed hWnds are empty');
             }
-            await sleep(waitTime);
             assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
         });
 
