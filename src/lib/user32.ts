@@ -102,23 +102,16 @@ export function show_hide_one(hWnd: GT.HWND, nCmdShow: U.constants.CmdShow): Pro
     return new Promise((resolve, reject) => {
         nCmdShow = +nCmdShow;
         // console.log('show_hide_one: ' + ref.address(hWnd) + ', cmd:' + nCmdShow);
-
         if (Number.isNaN(nCmdShow) || nCmdShow < 0) {
             return reject('show_hide_one() params nCmdShow invalid: ' + nCmdShow);
         }
-
         if (nCmdShow === 0) {
             if (!user32.IsWindowVisible(hWnd)) {   // skip if invisible
                 return resolve();
             }
         }
 
-        try {
-            user32.ShowWindow(hWnd, nCmdShow);
-        }
-        catch (ex) {
-            return reject(ex);
-        }
+        user32.ShowWindow(hWnd, nCmdShow);
         resolve(hWnd);
     });
 }
