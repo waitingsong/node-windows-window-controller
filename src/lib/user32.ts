@@ -31,8 +31,10 @@ export const enumWindowsProc = ffi.Callback(
         switch (task.matchType) {
             case 'pid': {
                 const buf = ref.alloc(W.HINSTANCE);
+                const tid = user32.GetWindowThreadProcessId(hWnd, buf);
 
-                if (user32.GetWindowThreadProcessId(hWnd, buf)) {
+
+                if ( ! tid) {
                     const pid = buf.readUInt32LE(0);
 
                     if (pid && pid === task.matchValue) {
@@ -41,7 +43,11 @@ export const enumWindowsProc = ffi.Callback(
                     }
                 }
                 else {
-                    task.errMsg += ',' + H.get_last_err_msg();
+                    const lastErrMsg = H.get_last_err_msg();
+
+                    if (lastErrMsg) {
+                        task.errMsg += ',' + lastErrMsg;
+                    }
                 }
                 break;
             }
@@ -49,8 +55,9 @@ export const enumWindowsProc = ffi.Callback(
             case 'title':
                 if (task.matchValue) {
                     const buf = Buffer.alloc(254);
+                    const len = user32.GetWindowTextW(hWnd, buf, 254);
 
-                    if (user32.GetWindowTextW(hWnd, buf, 254)) {
+                    if (len) {
                         const name = buf.toString('ucs2');
                         // const visible = user32.IsWindowVisible(hWnd);
 
@@ -63,7 +70,11 @@ export const enumWindowsProc = ffi.Callback(
                         }
                     }
                     else {
-                        task.errMsg += ',' + H.get_last_err_msg();
+                        const lastErrMsg = H.get_last_err_msg();
+
+                        if (lastErrMsg) {
+                            task.errMsg += ',' + lastErrMsg;
+                        }
                     }
                 }
                 else {  // all
@@ -109,10 +120,7 @@ export function show_hide_one(hWnd: GT.HWND, nCmdShow: U.constants.CmdShow): Pro
                 return resolve();
             }
         }
-
-        if ( ! user32.ShowWindow(hWnd, nCmdShow)) {
-            return reject(H.get_last_err_msg());
-        }
+        user32.ShowWindow(hWnd, nCmdShow);
         resolve(hWnd);
     });
 }
