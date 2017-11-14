@@ -26,7 +26,6 @@ const waitTime = '1s';
 const UC = Win.User32.constants;
 
 describe(filename, () => {
-    // for run calc.exe first
     describe('Should get_last_err_msg() works', () => {
         let child: ChildProcess;
         let hWnd: GT.HWND;
@@ -37,7 +36,7 @@ describe(filename, () => {
             await sleep(waitTime);
             child && child.kill();
             child = spawn('calc.exe');
-            await sleep(waitTime);      // for first long time loading
+            await sleep(waitTime);
             hWnd = H.find_n_check_calc_win();
             assert(!!user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
         });
