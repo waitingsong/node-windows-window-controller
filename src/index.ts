@@ -128,7 +128,7 @@ export function kill(opts: Config.Opts): Promise<Config.ExecRet> {
     }
     else {
         execRet.err = 1;
-        execRet.msg = 'kill() param must be either number or string';
+        execRet.msg = 'kill() matchType invalid';
         return Promise.resolve(execRet);
     }
 }
