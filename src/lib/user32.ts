@@ -2,6 +2,7 @@ import * as ffi from 'ffi';
 import * as ref from 'ref';
 import {U, conf as GCF, types as GT, windef as W} from 'win32-api';
 import * as Config from './types';
+import * as H from './helper';
 
 const user32 = U.load();
 
@@ -34,8 +35,7 @@ export const enumWindowsProc = ffi.Callback(
             case 'pid': {
                 const buf = ref.alloc(W.HINSTANCE);
 
-                try {
-                    user32.GetWindowThreadProcessId(hWnd, buf);
+                if (user32.GetWindowThreadProcessId(hWnd, buf)) {
                     const pid = buf.readUInt32LE(0);
 
                     if (pid && pid === task.matchValue) {
@@ -43,17 +43,17 @@ export const enumWindowsProc = ffi.Callback(
                         task.hwndSet.add(hWnd);
                     }
                 }
-                catch (ex) {
-                    task.errMsg += ',' + ex;
+                else {
+                    task.errMsg += ',' + H.get_last_err_msg();
                 }
                 break;
             }
 
             case 'title':
                 if (task.matchValue) {
-                    try {
-                        const buf = Buffer.alloc(254);
-                        const ret = user32.GetWindowTextW(hWnd, buf, 254);
+                    const buf = Buffer.alloc(254);
+
+                    if (user32.GetWindowTextW(hWnd, buf, 254)) {
                         const name = buf.toString('ucs2');
                         // const visible = user32.IsWindowVisible(hWnd);
 
@@ -65,8 +65,8 @@ export const enumWindowsProc = ffi.Callback(
                             task.hwndSet.add(hWnd);
                         }
                     }
-                    catch (ex) {
-                        task.errMsg += ',' + ex;
+                    else {
+                        task.errMsg += ',' + H.get_last_err_msg();
                     }
                 }
                 else {  // all
@@ -102,16 +102,20 @@ export function show_hide_one(hWnd: GT.HWND, nCmdShow: U.constants.CmdShow): Pro
     return new Promise((resolve, reject) => {
         nCmdShow = +nCmdShow;
         // console.log('show_hide_one: ' + ref.address(hWnd) + ', cmd:' + nCmdShow);
+
         if (Number.isNaN(nCmdShow) || nCmdShow < 0) {
             return reject('show_hide_one() params nCmdShow invalid: ' + nCmdShow);
         }
+
         if (nCmdShow === 0) {
             if (!user32.IsWindowVisible(hWnd)) {   // skip if invisible
                 return resolve();
             }
         }
 
-        user32.ShowWindow(hWnd, nCmdShow);
+        if ( ! user32.ShowWindow(hWnd, nCmdShow)) {
+            return reject(H.get_last_err_msg());
+        }
         resolve(hWnd);
     });
 }
