@@ -47,19 +47,15 @@ describe(filename, () => {
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
             opts.nCmdShow = 9;
-
             try {
-                await nwwc.show(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    if (!execRet.hwnds.length) {
-                        assert(false, 'processed hWnds should not empty');
-                    }
-                    await sleep(waitTime);
-                    assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
-                })
-                .catch(err => {
-                    assert(false, err);
-                });
+                const execRet = await nwwc.show(opts);
+
+                H.assert_execret(execRet);
+                if (!execRet.hwnds.length) {
+                    assert(false, 'processed hWnds should not empty');
+                }
+                await sleep(waitTime);
+                assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
             }
             catch (ex) {
                 assert(false, ex);
@@ -72,17 +68,13 @@ describe(filename, () => {
             opts.matchValue = child.pid;
             opts.nCmdShow = 9;
             try {
-                await nwwc.show(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    if (!execRet.hwnds.length) {
-                        assert(false, 'processed hWnds should not empty');
-                    }
-                    await sleep(waitTime);
-                    assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
-                })
-                .catch(err => {
-                    assert(false, err);
-                });
+                const execRet = await nwwc.show(opts);
+
+                if (!execRet.hwnds.length) {
+                    assert(false, 'processed hWnds should not empty');
+                }
+                await sleep(waitTime);
+                assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
             }
             catch (ex) {
                 assert(false, ex);
@@ -95,14 +87,11 @@ describe(filename, () => {
             opts.nCmdShow = 9;
 
             try {
-                await nwwc.show(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    await sleep(waitTime);
-                    assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
-                })
-                .catch(err => {
-                    assert(false, err);
-                });
+                const execRet = await nwwc.show(opts);
+
+                H.assert_execret(execRet);
+                await sleep(waitTime);
+                assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
             }
             catch (ex) {
                 assert(false, ex);
@@ -113,16 +102,11 @@ describe(filename, () => {
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
             opts.nCmdShow = 9;
-
             try {
-                await nwwc.show(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    await sleep(waitTime);
-                    assert(user32.IsWindowVisible(hWnd), 'window should visible');
-                })
-                .catch(err => {
-                    assert(false, err);
-                });
+                const execRet = await nwwc.show(opts);
+
+                await sleep(waitTime);
+                assert(user32.IsWindowVisible(hWnd), 'window should visible');
             }
             catch (ex) {
                 assert(false, ex);
@@ -134,19 +118,14 @@ describe(filename, () => {
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
             opts.nCmdShow = 9;
-
             try {
-                await nwwc.show(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    if (!execRet.hwnds.length) {
-                        assert(false, 'processed hWnds should not empty');
-                    }
-                    await sleep(waitTime);
-                    assert(user32.IsWindowVisible(hWnd), 'window should visible');
-                })
-                .catch(err => {
-                    assert(false, err);
-                });
+                const execRet = await nwwc.show(opts);
+
+                if (!execRet.hwnds.length) {
+                    assert(false, 'processed hWnds should not empty');
+                }
+                await sleep(waitTime);
+                assert(user32.IsWindowVisible(hWnd), 'window should visible');
             }
             catch (ex) {
                 assert(false, ex);
@@ -157,20 +136,16 @@ describe(filename, () => {
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
             opts.nCmdShow = 9;
-
             try {
-                await nwwc.show(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    // some hWnd has not WS_SYSMENU, so comment out
-                    // if (execRet.hwnds.length) {
-                    //     assert(false, 'processed hWnds should empty');
-                    // }
-                    await sleep(waitTime);
-                    assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
-                })
-                .catch(err => {
-                    assert(false, err);
-                });
+                const execRet = await nwwc.show(opts);
+
+                H.assert_execret(execRet);
+                // some hWnd has not WS_SYSMENU, so comment out
+                // if (execRet.hwnds.length) {
+                //     assert(false, 'processed hWnds should empty');
+                // }
+                await sleep(waitTime);
+                assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
             }
             catch (ex) {
                 assert(false, ex);
@@ -182,16 +157,12 @@ describe(filename, () => {
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
             opts.nCmdShow = 9;
-
             try {
-                await nwwc.show(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    await sleep(waitTime);
-                    assert( ! user32.IsWindowVisible(hWnd), 'window should invisible');
-                })
-                .catch(err => {
-                    assert(false, err);
-                });
+                const execRet = await nwwc.show(opts);
+
+                H.assert_execret(execRet);
+                await sleep(waitTime);
+                assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
             }
             catch (ex) {
                 assert(false, ex);
@@ -202,16 +173,11 @@ describe(filename, () => {
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
             opts.nCmdShow = 9;
-
             try {
-                await nwwc.show(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    await sleep(waitTime);
-                    assert(user32.IsWindowVisible(hWnd), 'window should visible');
-                })
-                .catch(err => {
-                    assert(false, err);
-                });
+                const execRet = await nwwc.show(opts);
+
+                await sleep(waitTime);
+                assert(user32.IsWindowVisible(hWnd), 'window should visible');
             }
             catch (ex) {
                 assert(false, ex);
@@ -225,13 +191,10 @@ describe(filename, () => {
             opts.matchType = 'hwnd';
             opts.matchValue = hwnd;
             opts.nCmdShow = 2;
-            await nwwc.show(opts).then(async () => {
-                await sleep(waitTime);
-                assert( !! user32.IsWindowVisible(hWnd), 'window should visible');
-            })
-                .catch(err => {
-                    assert(false, err);
-                });
+            const execRet = await nwwc.show(opts);
+
+            await sleep(waitTime);
+            assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
         });
         it('--hwnd by invalid value', async function() {
             const hwnd = 0;
@@ -239,32 +202,25 @@ describe(filename, () => {
             opts.matchType = 'hwnd';
             opts.matchValue = hwnd;
             opts.nCmdShow = 2;
-            await nwwc.show(opts).then(() => {
-                assert( ! user32.IsWindowVisible(hWnd), 'window should invisible');
-            })
-                .catch(err => {
-                    assert(false, err);
-                });
+            const execRet = await nwwc.show(opts);
+
+            assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
         });
 
         it('--title', async function() {
             opts.matchType = 'title';
             opts.matchValue = title;
             opts.nCmdShow = 9;
+            const execRet = await nwwc.show(opts);
 
-            await nwwc.show(opts).then(async (execRet) => {
-                H.assert_execret(execRet);
-                if (!execRet.hwnds.length) {
-                    assert(false, 'processed hWnds are empty');
-                }
-                await sleep(waitTime);
-                assert(!! user32.IsWindowVisible(hWnd), 'window should visible');
-            })
-            .catch(err => {
-                assert(false, err);
-            });
+            H.assert_execret(execRet);
+            if (!execRet.hwnds.length) {
+                assert(false, 'processed hWnds are empty');
+            }
+            await sleep(waitTime);
+            assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
         });
-    });
 
+    });
 
 });
