@@ -278,7 +278,10 @@ function validate_rule_title(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
 }
 
 function validate_rule_style(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
-    const dwStyle = user32.GetWindowLongPtrW(hWnd, -16);   // GWL_STYLE
+    const GWL_STYLE = -16;
+    const dwStyle = GCF._WIN64
+        ? user32.GetWindowLongPtrW(hWnd, GWL_STYLE)
+        : user32.GetWindowLongW(hWnd, GWL_STYLE);
     //console.log('style:', dwStyle);
 
     // if (dwStyle <= 0) {
@@ -299,7 +302,10 @@ function validate_rule_style(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
 }
 
 function validate_rule_exstyle(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
-    const dwExStyle = user32.GetWindowLongPtrW(hWnd, -20); // GWL_EXSTYLE
+    const GWL_EXSTYLE = -20;
+    const dwExStyle = GCF._WIN64
+        ? user32.GetWindowLongPtrW(hWnd, GWL_EXSTYLE)
+        : user32.GetWindowLongW(hWnd, GWL_EXSTYLE);
     // console.log('dwExstyle:' + dwExStyle);
 
     // if (dwExStyle <= 0) {
