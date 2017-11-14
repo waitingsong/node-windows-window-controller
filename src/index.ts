@@ -93,7 +93,7 @@ export function get_hwnds(opts: Config.Opts): Promise<GT.HWND[] | void> {
 }
 
 
-// kill process by which the matched hWnd(s) (window) created
+// kill process matched by pid|title
 export function kill(opts: Config.Opts): Promise<Config.ExecRet> {
     const execRet = init_execret();
 
