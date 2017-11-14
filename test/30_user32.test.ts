@@ -24,37 +24,35 @@ const UC = Win.User32.constants;
 
 describe(filename, () => {
 
-    // describe('Should validate_cmdshow() works', () => {
-    //     it('by positive value', function() {
-    //         assert(u32.validate_cmdshow(0));
-    //     });
+    describe('Should validate_cmdshow() works', () => {
+        it('by positive value', function() {
+            assert(u32.validate_cmdshow(0));
+        });
 
-    //     it('by negative value', function() {
-    //         assert( ! u32.validate_cmdshow(-1));
-    //     });
-    // });
+        it('by negative value', function() {
+            assert( ! u32.validate_cmdshow(-1));
+        });
+    });
 
-    // describe('Should create_task() works', () => {
-    //     it('check task value', function() {
-    //         const task = u32.create_task();
+    describe('Should create_task() works', () => {
+        it('check task value', function() {
+            const task = u32.create_task();
 
-    //         task || assert(false, 'task value invalid');
-    //         task.tno > 0 || assert(false, 'task.tno should positive value');
-    //         assert(task.matchType === null, 'task.matchType should null');
-    //         assert(task.matchValue === '', 'task.matchValue should empty string');
-    //         assert(task.hwndSet && ! task.hwndSet.size);
-    //         assert(task.pidSet && ! task.pidSet.size);
+            task || assert(false, 'task value invalid');
+            task.tno > 0 || assert(false, 'task.tno should positive value');
+            assert(task.matchType === null, 'task.matchType should null');
+            assert(task.matchValue === '', 'task.matchValue should empty string');
+            assert(task.hwndSet && ! task.hwndSet.size);
+            assert(task.pidSet && ! task.pidSet.size);
 
-    //     });
+        });
 
-    // });
+    });
 
     describe('Should show_hide_one() hide works', () => {
         let child: ChildProcess;
         let hWnd: GT.HWND;
         let opts: Config.Opts;
-
-        child = spawn('calc.exe');
 
         beforeEach(async () => {
             opts = <Config.Opts> {...Config.filterWinRulesDefaults};
@@ -98,6 +96,50 @@ describe(filename, () => {
                     assert(true);
                 });
         });
+    });
+
+    describe('Should show_hide_one() show works', () => {
+        let child: ChildProcess;
+        let hWnd: GT.HWND;
+        let opts: Config.Opts;
+
+
+        beforeEach(async () => {
+            opts = <Config.Opts> {...Config.filterWinRulesDefaults};
+            child && child.kill();
+            child = spawn('calc.exe');
+            await sleep(waitTime);
+            hWnd = H.find_n_check_calc_win();
+            assert(!!user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
+            await nwwc.hide({...opts, matchType: 'title', matchValue: title});
+            await sleep(waitTime);
+            assert(!user32.IsWindowVisible(hWnd), 'beforeEach: window should invisible');
+        });
+        afterEach(async () => {
+            child && child.kill();
+            await sleep(waitTime);
+        });
+
+
+        it('by valid hwnd value', async function() {
+            await u32.show_hide_one(hWnd, 2).then(async () => {
+                await sleep(waitTime);
+                assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
+            })
+                .catch(err => {
+                    assert(false, err);
+                });
+        });
+
+        it('by invalid hwnd value', async function() {
+            await u32.show_hide_one(ref.alloc(WD.HWND), 2).then(async () => {
+                assert(!user32.IsWindowVisible(hWnd), 'window should still invisible');
+            })
+                .catch(err => {
+                    assert(false, err);
+                });
+        });
+
     });
 
 
