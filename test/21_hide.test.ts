@@ -48,15 +48,11 @@ describe(filename, () => {
             try {
                 opts.matchType = 'pid';
                 opts.matchValue = child.pid;
+                const execRet = await nwwc.hide(opts);
 
-                await nwwc.hide(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    const visible = !!user32.IsWindowVisible(hWnd);
-                    assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-                })
-                    .catch(err => {
-                        assert(false, err);
-                    });
+                H.assert_execret(execRet);
+                const visible = !!user32.IsWindowVisible(hWnd);
+                assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
             }
             catch (ex) {
                 assert(false, ex);
@@ -69,14 +65,11 @@ describe(filename, () => {
             opts.matchValue = child.pid;
 
             try {
-                await nwwc.hide(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    const visible = !!user32.IsWindowVisible(hWnd);
-                    assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-                })
-                    .catch(err => {
-                        assert(false, err);
-                    });
+                const execRet = await nwwc.hide(opts);
+
+                H.assert_execret(execRet);
+                const visible = !!user32.IsWindowVisible(hWnd);
+                assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
             }
             catch (ex) {
                 assert(false, ex);
@@ -86,16 +79,12 @@ describe(filename, () => {
             opts.titleExits = false;   // win should not processed by it
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
-
             try {
-                await nwwc.hide(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    const visible = !!user32.IsWindowVisible(hWnd);
-                    assert(visible, ': window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-                })
-                    .catch(err => {
-                        assert(false, err);
-                    });
+                const execRet = await nwwc.hide(opts);
+
+                H.assert_execret(execRet);
+                const visible = !!user32.IsWindowVisible(hWnd);
+                assert(visible, ': window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
             }
             catch (ex) {
                 assert(false, ex);
@@ -106,16 +95,12 @@ describe(filename, () => {
             opts.includeStyle = UC.WS_SYSMENU;
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
-
             try {
-                await nwwc.hide(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    const visible = !!user32.IsWindowVisible(hWnd);
-                    assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-                })
-                    .catch(err => {
-                        assert(false, err);
-                    });
+                const execRet = await nwwc.hide(opts);
+
+                H.assert_execret(execRet);
+                const visible = !!user32.IsWindowVisible(hWnd);
+                assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
             }
             catch (ex) {
                 assert(false, ex);
@@ -125,16 +110,12 @@ describe(filename, () => {
             opts.excludeStyle = UC.WS_SYSMENU;
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
-
             try {
-                await nwwc.hide(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    const visible = !!user32.IsWindowVisible(hWnd);
-                    assert(visible, ': window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-                })
-                    .catch(err => {
-                        assert(false, err);
-                    });
+                const execRet = await nwwc.hide(opts);
+
+                H.assert_execret(execRet);
+                const visible = !!user32.IsWindowVisible(hWnd);
+                assert(visible, ': window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
             }
             catch (ex) {
                 assert(false, ex);
@@ -145,16 +126,12 @@ describe(filename, () => {
             opts.includeStyle = UC.WS_VISIBLE; // win should processed by it
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
-
             try {
-                await nwwc.hide(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    const visible = !!user32.IsWindowVisible(hWnd);
-                    assert( ! visible, 'window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-                })
-                    .catch(err => {
-                        assert(false, err);
-                    });
+                const execRet = await nwwc.hide(opts);
+
+                H.assert_execret(execRet);
+                const visible = !!user32.IsWindowVisible(hWnd);
+                assert(!visible, 'window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
             }
             catch (ex) {
                 assert(false, ex);
@@ -164,16 +141,12 @@ describe(filename, () => {
             opts.excludeStyle = UC.WS_VISIBLE; // win should not processed by it
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
-
             try {
-                await nwwc.hide(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    const visible = !!user32.IsWindowVisible(hWnd);
-                    assert(visible, 'window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-                })
-                    .catch(err => {
-                        assert(false, err);
-                    });
+                const execRet = await nwwc.hide(opts);
+
+                H.assert_execret(execRet);
+                const visible = !!user32.IsWindowVisible(hWnd);
+                assert(visible, 'window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
             }
             catch (ex) {
                 assert(false, ex);
@@ -184,16 +157,12 @@ describe(filename, () => {
             opts.includeExStyle = UC.WS_EX_TOOLWINDOW; // calculator has no style of WS_EX_TOOLWINDOW
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
-
             try {
-                await nwwc.hide(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    const visible = !!user32.IsWindowVisible(hWnd);
-                    assert(visible, ': window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-                })
-                    .catch(err => {
-                        assert(false, err);
-                    });
+                const execRet = await nwwc.hide(opts);
+
+                H.assert_execret(execRet);
+                const visible = !!user32.IsWindowVisible(hWnd);
+                assert(visible, ': window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
             }
             catch (ex) {
                 assert(false, ex);
@@ -203,16 +172,12 @@ describe(filename, () => {
             opts.excludeExStyle = UC.WS_EX_TOOLWINDOW; // calculator has no style of WS_EX_TOOLWINDOW
             opts.matchType = 'pid';
             opts.matchValue = child.pid;
-
             try {
-                await nwwc.hide(opts).then(async (execRet) => {
-                    H.assert_execret(execRet);
-                    const visible = !!user32.IsWindowVisible(hWnd);
-                    assert(! visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-                })
-                    .catch(err => {
-                        assert(false, err);
-                    });
+                const execRet = await nwwc.hide(opts);
+
+                H.assert_execret(execRet);
+                const visible = !!user32.IsWindowVisible(hWnd);
+                assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
             }
             catch (ex) {
                 assert(false, ex);
@@ -222,44 +187,32 @@ describe(filename, () => {
         it('--title', async function() {
             opts.matchType = 'title';
             opts.matchValue = title;
+            const execRet = await nwwc.hide(opts);
 
-            await nwwc.hide(opts).then((execRet) => {
-                H.assert_execret(execRet);
-                const visible = !!user32.IsWindowVisible(hWnd);
-                assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-            })
-                .catch(err => {
-                    assert(false, err);
-                });
+            H.assert_execret(execRet);
+            const visible = !!user32.IsWindowVisible(hWnd);
+            assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
         });
 
         it('--title with titleExists true', async function() {
             opts.titleExits = true;
             opts.matchType = 'title';
             opts.matchValue = title;
+            const execRet = await nwwc.hide(opts);
 
-            await nwwc.hide(opts).then((execRet) => {
-                H.assert_execret(execRet);
-                const visible = !!user32.IsWindowVisible(hWnd);
-                assert( ! visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-            })
-                .catch(err => {
-                    assert(false, err);
-                });
+            H.assert_execret(execRet);
+            const visible = !!user32.IsWindowVisible(hWnd);
+            assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
         });
         it('--title with titleExists false', async function() {
             opts.titleExits = false;
             opts.matchType = 'title';
             opts.matchValue = title;
+            const execRet = await nwwc.hide(opts);
 
-            await nwwc.hide(opts).then((execRet) => {
-                H.assert_execret(execRet);
-                const visible = !!user32.IsWindowVisible(hWnd);
-                assert(visible, ': window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-            })
-                .catch(err => {
-                    assert(false, err);
-                });
+            H.assert_execret(execRet);
+            const visible = !!user32.IsWindowVisible(hWnd);
+            assert(visible, ': window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
         });
 
         it('--hwnd by valid value', async function() {
@@ -268,13 +221,10 @@ describe(filename, () => {
             opts.matchType = 'hwnd';
             opts.matchValue = hwnd;
             opts.nCmdShow = 0;
-            await nwwc.hide(opts).then(async () => {
-                await sleep(waitTime);
-                assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
-            })
-                .catch(err => {
-                    assert(false, err);
-                });
+            const execRet = await nwwc.hide(opts);
+
+            await sleep(waitTime);
+            assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
         });
         it('--hwnd by invalid value', async function() {
             const hwnd = 0;
@@ -282,12 +232,9 @@ describe(filename, () => {
             opts.matchType = 'hwnd';
             opts.matchValue = hwnd;
             opts.nCmdShow = 0;
-            await nwwc.hide(opts).then(() => {
-                assert(!! user32.IsWindowVisible(hWnd), 'window should visible');
-            })
-                .catch(err => {
-                    assert(false, err);
-                });
+            const execRet = await nwwc.hide(opts);
+
+            assert(!!user32.IsWindowVisible(hWnd), 'window should visible');
         });
     });
 
