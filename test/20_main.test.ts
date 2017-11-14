@@ -144,4 +144,106 @@ describe(filename, () => {
             }
         });
     });
+
+    describe('Should kill() works', () => {
+        let child: ChildProcess;
+        let hWnd: GT.HWND;
+        let opts: Config.Opts;
+
+        beforeEach(async () => {
+            opts = <Config.Opts> {...Config.filterWinRulesDefaults};
+            await sleep(waitTime);
+            child && child.kill();
+            child = spawn('calc.exe');
+            await sleep(waitTime);
+            hWnd = H.find_n_check_calc_win();
+            assert(!!user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
+            await sleep(waitTime);
+        });
+        afterEach(async () => {
+            await sleep(waitTime);
+            child && child.kill();
+        });
+
+        it('by valid pid', async function() {
+            opts.matchType = 'pid';
+            opts.matchValue = child.pid;
+
+            try {
+                const execRet = await nwwc.kill(opts);
+
+                H.assert_execret(execRet);
+                if ( ! execRet.pids || ! execRet.pids.length) {
+                    assert(false, 'should window pid matched');
+                }
+            }
+            catch (ex) {
+                assert(false, ex);
+            }
+        });
+        it('by invalid pid', async function() {
+            opts.matchType = 'pid';
+            opts.matchValue = 0;
+
+            try {
+                const execRet = await nwwc.kill(opts);
+
+                H.assert_execret(execRet, true);
+                if (execRet.hwnds && execRet.hwnds.length) {
+                    assert(false, 'should none window title matched');
+                }
+            }
+            catch (ex) {
+                assert(false, ex);
+            }
+        });
+
+        it('by valid title', async function() {
+            opts.matchType = 'title';
+            opts.matchValue = title;
+
+            try {
+                const execRet = await nwwc.kill(opts);
+
+                H.assert_execret(execRet);
+                if ( ! execRet.pids || ! execRet.pids.length) {
+                    assert(false, 'should window title matched');
+                }
+            }
+            catch (ex) {
+                assert(false, ex);
+            }
+        });
+        it('by fake title', async function() {
+            opts.matchType = 'title';
+            opts.matchValue = 'title-not-exists';
+
+            try {
+                const execRet = await nwwc.kill(opts);
+
+                H.assert_execret(execRet);    // no err
+                if (execRet.pids && execRet.pids.length) {
+                    assert(false, 'should none window title matched');
+                }
+            }
+            catch (ex) {
+                assert(false, ex);
+            }
+        });
+
+        it('by hwnd not support', async function() {
+            opts.matchType = 'hwnd';
+            opts.matchValue = ref.address(hWnd);
+
+            try {
+                H.assert_execret(await nwwc.kill(opts), true);
+            }
+            catch (ex) {
+                assert(false, ex);
+            }
+        });
+
+    });
+
+
 });
