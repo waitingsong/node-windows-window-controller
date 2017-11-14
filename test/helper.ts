@@ -72,3 +72,20 @@ export function assert_execret(execRet: Config.ExecRet): void {
         assert(false, execRet.msg);
     }
 }
+
+export function assert_get_hwnds(hWndDec: number, task: Config.Task, arr: void | GT.HWND[]): void {
+    let got = false;
+
+    if (arr && arr.length) {
+        for (const h of arr) {
+            if (ref.address(h) === hWndDec) {   // compare with decimal, not Buffer!
+                assert(true);
+                got = true;
+            }
+        }
+        got || assert(false, 'return array of hWnd not matched the hWnd');
+    }
+    else {
+        assert(false, 'found none hWnd');
+    }
+}

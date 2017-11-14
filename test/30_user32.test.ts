@@ -169,7 +169,7 @@ describe(filename, () => {
             task.matchValue = child.pid;
             const arr = await u32.task_get_hwnds(task);
 
-            assert_task_get_hwnds(hWndDec, task, arr);
+            H.assert_get_hwnds(hWndDec, task, arr);
         });
 
         it('matched by title', async function() {
@@ -180,7 +180,7 @@ describe(filename, () => {
             task.matchValue = title;
             const arr = await u32.task_get_hwnds(task);
 
-            assert_task_get_hwnds(hWndDec, task, arr);
+            H.assert_get_hwnds(hWndDec, task, arr);
         });
 
         it('matched by hWndDec', async function() {
@@ -191,26 +191,10 @@ describe(filename, () => {
             task.matchValue = hWndDec;
             const arr = await u32.task_get_hwnds(task);
 
-            assert_task_get_hwnds(hWndDec, task, arr);
+            H.assert_get_hwnds(hWndDec, task, arr);
         });
 
     });
 
 });
 
-function assert_task_get_hwnds(hWndDec: number, task: Config.Task, arr: void | GT.HWND[]): void {
-    let got = false;
-
-    if (arr && arr.length) {
-        for (const h of arr) {
-            if (ref.address(h) === hWndDec) {   // compare with decimal, not Buffer!
-                assert(true);
-                got = true;
-            }
-        }
-        got || assert(false, 'return array of hWnd not matched the hWnd');
-    }
-    else {
-        assert(false, 'found none hWnd');
-    }
-}
