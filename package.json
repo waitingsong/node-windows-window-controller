@@ -34,7 +34,8 @@
     "exclude": [
       "**/*.js",
       "**/*.test.ts",
-      "**/*.d.ts"
+      "**/*.d.ts",
+      "test"
     ],
     "extension": [
       ".ts",
