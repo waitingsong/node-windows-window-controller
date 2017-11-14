@@ -125,9 +125,6 @@ export function show_hide_one(hWnd: GT.HWND, nCmdShow: U.constants.CmdShow): Pro
 
 
 export function task_get_hwnds(task: Config.Task): Promise<GT.HWND[] | void> {
-    if (!task) {
-        task = create_task();
-    }
     let t: NodeJS.Timer;
 
     return Promise.race([
