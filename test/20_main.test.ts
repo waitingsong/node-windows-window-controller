@@ -46,15 +46,11 @@ describe(filename, () => {
         it('--title', async function() {
             opts.matchType = 'title';
             opts.matchValue = title;
+            const execRet = await nwwc.hide(opts);
 
-            await nwwc.hide(opts).then((execRet) => {
-                H.assert_execret(execRet);
-                const visible = !!user32.IsWindowVisible(hWnd);
-                assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
-            })
-                .catch(err => {
-                    assert(false, err);
-                });
+            H.assert_execret(execRet);
+            const visible = !!user32.IsWindowVisible(hWnd);
+            assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"');
         });
 
     });
