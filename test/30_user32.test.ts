@@ -11,6 +11,7 @@ import {conf as GCF, types as GT, windef as WD, conf} from 'win32-api';
 import * as Config from '../src/lib/types';
 import * as u32 from '../src/lib/user32';
 import * as H from './helper';
+import {assert_execret} from './helper';
 
 const filename = basename(__filename);
 const Win = nwwc.Win;
@@ -23,7 +24,6 @@ const UC = Win.User32.constants;
 
 
 describe(filename, () => {
-
     describe('Should validate_cmdshow() works', () => {
         it('by positive value', function() {
             assert(u32.validate_cmdshow(0));
@@ -103,7 +103,6 @@ describe(filename, () => {
         let hWnd: GT.HWND;
         let opts: Config.Opts;
 
-
         beforeEach(async () => {
             opts = <Config.Opts> {...Config.filterWinRulesDefaults};
             child && child.kill();
@@ -142,5 +141,76 @@ describe(filename, () => {
 
     });
 
+    describe('Should task_get_hwnds() works', () => {
+        let child: ChildProcess;
+        let hWnd: GT.HWND;
+        let opts: Config.Opts;
+
+        beforeEach(async () => {
+            opts = <Config.Opts> {...Config.filterWinRulesDefaults};
+            await sleep(waitTime);
+            child && child.kill();
+            child = spawn('calc.exe');
+            await sleep(waitTime);
+            hWnd = H.find_n_check_calc_win();
+            assert(!!user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
+            await sleep(waitTime);
+        });
+        afterEach(async () => {
+            await sleep(waitTime);
+            child && child.kill();
+        });
+
+        it('matched by pid', async function() {
+            const task = u32.create_task();
+            const hWndDec = ref.address(hWnd);
+
+            task.matchType = 'pid';
+            task.matchValue = child.pid;
+            const arr = await u32.task_get_hwnds(task);
+
+            assert_task_get_hwnds(hWndDec, task, arr);
+        });
+
+        it('matched by title', async function() {
+            const task = u32.create_task();
+            const hWndDec = ref.address(hWnd);
+
+            task.matchType = 'title';
+            task.matchValue = title;
+            const arr = await u32.task_get_hwnds(task);
+
+            assert_task_get_hwnds(hWndDec, task, arr);
+        });
+
+        it('matched by hWndDec', async function() {
+            const task = u32.create_task();
+            const hWndDec = ref.address(hWnd);
+
+            task.matchType = 'hwnd';
+            task.matchValue = hWndDec;
+            const arr = await u32.task_get_hwnds(task);
+
+            assert_task_get_hwnds(hWndDec, task, arr);
+        });
+
+    });
 
 });
+
+function assert_task_get_hwnds(hWndDec: number, task: Config.Task, arr: void | GT.HWND[]): void {
+    let got = false;
+
+    if (arr && arr.length) {
+        for (const h of arr) {
+            if (ref.address(h) === hWndDec) {   // compare with decimal, not Buffer!
+                assert(true);
+                got = true;
+            }
+        }
+        got || assert(false, 'return array of hWnd not matched the hWnd');
+    }
+    else {
+        assert(false, 'found none hWnd');
+    }
+}
