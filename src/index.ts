@@ -93,12 +93,18 @@ export function get_hwnds(opts: Config.Opts): Promise<GT.HWND[] | void> {
 }
 
 
-// kill process matched by pid|title
+// kill process matched by pid|title, ExecRet.pids contains processed pid
 export function kill(opts: Config.Opts): Promise<Config.ExecRet> {
     const execRet = init_execret();
 
     if (opts.matchType === 'pid') {
         const pid = +opts.matchValue;
+
+        if (pid <= 0) {
+            execRet.err = 1;
+            execRet.msg = 'pid value invalid';
+            return Promise.resolve(execRet);
+        }
 
         _kill(pid);
         execRet.pids.push(pid);
@@ -120,7 +126,7 @@ export function kill(opts: Config.Opts): Promise<Config.ExecRet> {
                     }
                 }
                 else {
-                    execRet.msg = 'the pid list to be killed empty';
+                    execRet.msg = 'the pid list to be killed empty, none title matched';
                 }
                 resolve(execRet);
             });
