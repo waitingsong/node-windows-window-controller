@@ -169,7 +169,7 @@ describe(filename, () => {
             task.matchValue = child.pid;
             const arr = await u32.task_get_hwnds(task);
 
-            H.assert_get_hwnds(hWndDec, task, arr);
+            H.assert_get_hwnds(hWndDec, arr);
         });
 
         it('matched by title', async function() {
@@ -180,7 +180,7 @@ describe(filename, () => {
             task.matchValue = title;
             const arr = await u32.task_get_hwnds(task);
 
-            H.assert_get_hwnds(hWndDec, task, arr);
+            H.assert_get_hwnds(hWndDec, arr);
         });
 
         it('matched by hWndDec', async function() {
@@ -191,7 +191,7 @@ describe(filename, () => {
             task.matchValue = hWndDec;
             const arr = await u32.task_get_hwnds(task);
 
-            H.assert_get_hwnds(hWndDec, task, arr);
+            H.assert_get_hwnds(hWndDec, arr);
         });
 
     });

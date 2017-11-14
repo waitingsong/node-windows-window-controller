@@ -73,7 +73,7 @@ export function assert_execret(execRet: Config.ExecRet): void {
     }
 }
 
-export function assert_get_hwnds(hWndDec: number, task: Config.Task, arr: void | GT.HWND[]): void {
+export function assert_get_hwnds(hWndDec: number, arr: void | GT.HWND[]): void {
     let got = false;
 
     if (arr && arr.length) {
