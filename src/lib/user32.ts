@@ -133,7 +133,7 @@ export function task_get_hwnds(task: Config.Task): Promise<GT.HWND[] | void> {
     return Promise.race([
         new Promise<void>(resolve => {
             t = setTimeout(() => {
-                console.error('task_get_hwnds timeout failed');
+                console.info('task_get_hwnds timeout failed');
                 resolve();
             }, 30000); // @HARDCOD
         }),
