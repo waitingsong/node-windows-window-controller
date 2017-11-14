@@ -18,6 +18,9 @@ export function get_last_err_msg(): string {
         if (msglen) {
             errMsg = errcode + ': ' + ref.reinterpretUntilZeros(buf, 2).toString('ucs2');
         }
+        else {
+            errMsg = `${errcode}: unknown error meeage`;
+        }
     }
 
     return errMsg;
