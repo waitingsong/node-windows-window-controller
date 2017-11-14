@@ -8,6 +8,7 @@ import * as assert from 'power-assert';
 import * as nwwc from '../src/index';
 import {conf as GCF, types as GT} from 'win32-api';
 import * as Config from '../src/lib/types';
+import {reverse} from 'dns';
 
 const Win = nwwc.Win;
 const knl32 = Win.Kernel32.load();
@@ -67,9 +68,13 @@ export function change_title(hWnd: GT.HWND, title: string): void {
 
 }
 
-export function assert_execret(execRet: Config.ExecRet): void {
+export function assert_execret(execRet: Config.ExecRet, revert?: boolean): void {
+    revert = !! revert;
     if (execRet.err) {
-        assert(false, execRet.msg);
+        assert(revert, execRet.msg);
+    }
+    else {
+        assert( ! revert, execRet.msg);
     }
 }
 
