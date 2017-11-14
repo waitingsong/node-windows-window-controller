@@ -29,13 +29,11 @@ describe(filename, () => {
 
         beforeEach(async () => {
             opts = <Config.Opts> {...Config.filterWinRulesDefaults};
-            await sleep(waitTime);
             child && child.kill();
             child = spawn('calc.exe');
             await sleep(waitTime);
             hWnd = H.find_n_check_calc_win();
             assert(!!user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
-            await sleep(waitTime);
         });
         afterEach(async () => {
             await sleep(waitTime);
