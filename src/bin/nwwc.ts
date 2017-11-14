@@ -1,47 +1,27 @@
 #!/usr/bin/env node
 
 /**
+ * show or hide window(s)
  * arguments:
- * --hwnd={integer} --status={nCmdShow}
+ * --pid={integer}
+ * --title={string}
+ * --hwnd={integer}
+ * --status={nCmdShow}
  */
 
-import showWindow, {validate_cmdshow} from '../index';
+import * as yargs from 'yargs';
+import * as nwwc from '../index';
 
-const [, , ...argv] = process.argv;
-let hWnd: number = 0;
-let status: number = -1;
+const opts = nwwc.parse_cli_opts(yargs.argv);
 
-if (!argv || !argv.length) {
-    console.error('argv empty. arguments: --hwnd --status');
+if (! opts) {
+    console.error('argv empty. options: --pid|title|hwnd --status');
     console.log('status value See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx');
     process.exit(1);
 }
-
-for (let v of argv) {
-    if (!hWnd && v.indexOf('--hwnd=') === 0) {
-        let {[1]: id} = v.split('=');
-
-        if (id && Number.isInteger(+id)) {
-            hWnd = +id;
-        }
-    }
-    else if (v.indexOf('--status') === 0) {
-        let {[1]: vv} = v.split('=');
-
-        if (vv && Number.isInteger(+vv)) {
-            status = +vv;
-            break;
-        }
-    }
+else {
+    nwwc.show(opts).then((execRet: nwwc.ExecRet) => {
+        console.log('process ret:', execRet);
+        process.exit(execRet.err);
+    });
 }
-
-if (hWnd <= 0) {
-    process.exit(1);
-}
-if (!validate_cmdshow(status)) {
-    process.exit(1);
-}
-
-showWindow(hWnd, status).then((errcode) => {
-    process.exit(errcode);
-});

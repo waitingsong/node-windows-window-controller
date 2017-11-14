@@ -24,43 +24,14 @@ const isWin32: boolean = process.platform === 'win32';
 const plateformError = 'Invalid platform: win32 required';
 const user32 = U.load();
 
-
-// expose original user32.ShowWindow() as default
-export default function showWindow(hwnd: Config.Hwnd, nCmdShow: U.constants.CmdShow): Promise<Config.ErrCode> {
-    let errcode = 1;
-    hwnd = +hwnd;
-
-    if (typeof hwnd !== 'number' || ! Number.isSafeInteger(hwnd)) {
-        console.error('hwnd must integer');
-        return Promise.resolve(errcode);
-    }
-    if (hwnd <= 0) {
-        return Promise.resolve(errcode);
-    }
-    if ( ! u32.validate_cmdshow(nCmdShow)) {
-        return Promise.resolve(errcode);
-    }
-
-    return retrieve_pointer_by_hwnd(hwnd)
-        .then(hWnd => {
-            if (hWnd && ! ref.isNull(hWnd)) {
-                if (user32.ShowWindow(hWnd, nCmdShow)) {
-                    errcode = 0;
-                }
-            }
-            return errcode;
-        })
-        .catch((err: Error) => {
-            return errcode;
-        });
-}
-
+// hide the window(s)
 export function hide(options: Config.Opts): Promise<Config.ExecRet> {
     const opts: Config.Opts = Object.assign({}, Config.filterWinRulesDefaults, options);
     opts.nCmdShow = U.constants.CmdShow.SW_HIDE;
     return proxy(opts);
 }
 
+// show or hide the window(s)
 export function show(options: Config.Opts): Promise<Config.ExecRet> {
     const opts: Config.Opts = Object.assign({}, Config.showFilterRulesDefaults, options);
 
@@ -218,3 +189,5 @@ export function parse_cli_opts(argv: Config.CliOpts): void | Config.Opts {
 
     return opts;
 }
+
+export default show;
