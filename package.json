@@ -66,7 +66,8 @@
   ],
   "dependencies": {
     "ffi": "^2.2.0",
-    "win32-api": "^1.10.1"
+    "win32-api": "^1.10.1",
+    "yargs": "^10.0.3"
   },
   "devDependencies": {
     "@types/ffi": "^0.0.19",
@@ -75,6 +76,7 @@
     "@types/power-assert": "^1.4.29",
     "@types/ref": "^0.0.28",
     "@types/ref-struct": "^0.0.28",
+    "@types/yargs": "^8.0.2",
     "coveralls": "^3.0.0",
     "eslint": "^4.10.0",
     "intelli-espower-loader": "^1.0.1",

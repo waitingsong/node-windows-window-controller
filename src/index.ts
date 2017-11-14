@@ -16,6 +16,7 @@ import * as Config from './lib/types';
 import * as u32 from './lib/user32';
 
 export {Win};
+export {Config};
 export {ExecRet} from './lib/types';
 export {validate_cmdshow} from './lib/user32';
 
@@ -54,37 +55,37 @@ export default function showWindow(hwnd: Config.Hwnd, nCmdShow: U.constants.CmdS
         });
 }
 
-export function hide(p: Config.matchParam, filterWinRules?: Config.FilterWinRules): Promise<Config.ExecRet> {
-    const rules: Config.FilterWinRules = Object.assign({}, Config.filterWinRulesDefaults, filterWinRules);
-    return proxy(p, U.constants.CmdShow.SW_HIDE, rules);
+export function hide(options: Config.Opts): Promise<Config.ExecRet> {
+    const opts: Config.Opts = Object.assign({}, Config.filterWinRulesDefaults, options);
+    opts.nCmdShow = U.constants.CmdShow.SW_HIDE;
+    return proxy(opts);
 }
 
-export function show(p: Config.matchParam, nCmdShow: U.constants.CmdShow, filterWinRules?: Config.FilterWinRules): Promise<Config.ExecRet> {
-    const rules: Config.FilterWinRules = Object.assign({}, Config.showFilterRulesDefaults, filterWinRules);
+export function show(options: Config.Opts): Promise<Config.ExecRet> {
+    const opts: Config.Opts = Object.assign({}, Config.showFilterRulesDefaults, options);
 
-    if ( ! filterWinRules || (filterWinRules.titleExits === null || typeof filterWinRules.titleExits !== 'boolean')) {
-        rules.titleExits = true;
+    if ( ! opts || (opts.titleExits === null || typeof opts.titleExits !== 'boolean')) {
+        opts.titleExits = true;
     }
-
-    return proxy(p, nCmdShow, rules);
+    return proxy(opts);
 }
 
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx
-function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, rules: Config.FilterWinRules): Promise<Config.ExecRet> {
+function proxy(opts: Config.Opts): Promise<Config.ExecRet> {
     const execRet = init_execret();
 
-    if ( ! u32.validate_cmdshow(nCmdShow)) {
+    if ( ! u32.validate_cmdshow(opts.nCmdShow)) {
         execRet.err = 1;
         execRet.msg = 'value of nCmdShow invalid';
         return Promise.resolve(execRet);
     }
 
-    return get_hwnds(p, rules).then(hWnds => {
+    return get_hwnds(opts).then(hWnds => {
             if (hWnds && hWnds.length) {
                 for (const hWnd of hWnds) {
                     if (hWnd && !ref.isNull(hWnd)) {
                         // console.log('hWnd addr:', ref.address(hWnd));
-                        u32.show_hide_one(hWnd, nCmdShow)
+                        u32.show_hide_one(hWnd, opts.nCmdShow)
                             .then((hWnd) => hWnd && !ref.isNull(hWnd) && execRet.hwnds.push(ref.address(hWnd)))
                             .catch((err: Error) => {
                                 execRet.err = 1;
@@ -105,36 +106,41 @@ function proxy(p: Config.matchParam, nCmdShow: U.constants.CmdShow, rules: Confi
 /**
  * retrieve hWnds by matchValue matched by pid|title
  */
-export function get_hwnds(p: Config.matchParam, rules?: Config.FilterWinRules): Promise<GT.HWND[] | void> {
-    // console.log('rules:', rules, 'p:', p);
-    if ( ! rules) {
-        return u32.get_hwnds(p);
-    }
-    else {
-        return u32.get_hwnds(p)
-            .then((arr: GT.HWND[] | void) => {
-                if (arr && Array.isArray(arr) && arr.length) {
-                    return u32.filter_hwnd(arr, rules);
-                }
-            });
-    }
+export function get_hwnds(opts: Config.Opts): Promise<GT.HWND[] | void> {
+    // console.log('opts:', opts);
+    const task = u32.create_task();
+
+    task.matchType = opts.matchType;
+    task.matchValue = opts.matchValue;
+
+    return u32.task_get_hwnds(task)
+        .then((arr: GT.HWND[] | void) => {
+            if (arr && Array.isArray(arr) && arr.length) {
+                return u32.filter_hwnd(arr, opts);
+            }
+        });
 }
 
 
 // kill process by which the matched hWnd(s) (window) created
-export function kill(p: Config.matchParam): Promise<Config.ExecRet> {
+export function kill(opts: Config.Opts): Promise<Config.ExecRet> {
     const execRet = init_execret();
 
-    if (typeof p === 'number') {
-        _kill(p);
-        execRet.pids.push(p);
+    if (opts.matchType === 'pid') {
+        const pid = +opts.matchValue;
+
+        _kill(pid);
+        execRet.pids.push(pid);
         return Promise.resolve(execRet);
     }
-    else if (typeof p === 'string') {
+    else if (opts.matchType === 'title') {
         return new Promise(resolve => {
             const task = u32.create_task();
 
-            return u32.get_hwnds(p, task).then(() => {
+            task.matchType = opts.matchType;
+            task.matchValue = opts.matchValue;
+
+            return u32.task_get_hwnds(task).then(() => {
                 if (task.pidSet.size) {
                     for (let pid of task.pidSet) {
                         if (_kill(pid)) {
@@ -181,10 +187,34 @@ export function retrieve_pointer_by_hwnd(hwnd: Config.Hwnd): Promise<void | GT.H
     const task = u32.create_task();
 
     task.matchType = 'hwnd';
-    return u32.get_hwnds(hwnd, task)
+    task.matchValue = hwnd;
+
+    return u32.task_get_hwnds(task)
         .then(arr => {
             if (arr && arr.length) {
                 return arr[0];
             }
         });
+}
+
+export function parse_cli_opts(argv: Config.CliOpts): void | Config.Opts {
+    const opts = <Config.Opts> Object.assign({}, Config.showFilterRulesDefaults);
+
+    if (argv.pid) {
+        opts.matchType = 'pid';
+        opts.matchValue = +argv.pid;
+    }
+    else if (argv.title) {
+        opts.matchType = 'title';
+        opts.matchValue = argv.title;
+    }
+    else if (argv.hwnd) {
+        opts.matchType = 'hwnd';
+        opts.matchValue = argv.hwnd;
+    }
+    else {
+        return;
+    }
+
+    return opts;
 }

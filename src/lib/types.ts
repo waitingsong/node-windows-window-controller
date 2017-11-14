@@ -1,15 +1,17 @@
 import {types as GT, User32} from 'win32-api';
 
 const UC = User32.constants;
-export type matchParam = number | string;    // pid or keyword
 export type Tno = number;
 export type Hwnd = number;
+export type matchParam = number | string;    // pid or keyword
+export type matchType = 'pid' | 'title' | 'hwnd' | null;  // hwnd is dec/hex value, not hWnd buf
+
 export interface Task {
     readonly tno: Tno;
     hwndSet: Set<GT.HWND>; // result buf[]
     pidSet: Set<GT.PID>;   // result dec[]
-    matchType: 'pid' | 'title' | 'hwnd' | null;    // hwnd is dec/hex value, not hWnd buf
-    matchValue: string | number;
+    matchType: matchType;
+    matchValue: matchParam;
     errMsg: string;
 }
 
@@ -22,7 +24,7 @@ export interface ExecRet {
 }
 
 export interface FilterWinRules {
-    titleExits: boolean | null;  // default null means 'ignore'
+    titleExits?: boolean | null;  // default null means 'ignore'
     includeStyle?: number | null;
     excludeStyle?: number | null;
     includeExStyle?: number | null;
@@ -42,3 +44,17 @@ export const showFilterRulesDefaults = {
     includeExStyle: null,
     excludeExStyle: UC.WS_EX_TOOLWINDOW,
 };
+
+export interface CliOpts {
+    title?: string;
+    pid?: matchParam;
+    hwnd?: matchParam;
+    status?: matchParam;
+    [prop: string]: any;
+}
+
+export interface Opts extends FilterWinRules {
+    matchType: matchType;
+    matchValue: matchParam;
+    nCmdShow: number;
+}

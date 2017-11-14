@@ -124,11 +124,10 @@ export function show_hide_one(hWnd: GT.HWND, nCmdShow: U.constants.CmdShow): Pro
 }
 
 
-export function get_hwnds(p: Config.matchParam, task?: Config.Task): Promise<GT.HWND[] | void> {
+export function task_get_hwnds(task: Config.Task): Promise<GT.HWND[] | void> {
     if (!task) {
         task = create_task();
     }
-    task.matchValue = p;
     let t: NodeJS.Timer;
 
     return Promise.race([
@@ -209,12 +208,12 @@ function get_task_hwnd(task: Config.Task): Promise<GT.HWND[]> {
 
 
 // get hWnd of main top-level window
-export function filter_hwnd(arr: GT.HWND[], filterWinRules?: Config.FilterWinRules): GT.HWND[]{
-    if (typeof filterWinRules === 'undefined') {
+export function filter_hwnd(arr: GT.HWND[], opts?: Config.Opts): GT.HWND[]{
+    if (typeof opts === 'undefined') {
         return [...(new Set(arr).keys())];
     }
     else {
-        const rules: Config.FilterWinRules = Object.assign({}, Config.filterWinRulesDefaults, filterWinRules);
+        opts = Object.assign({}, Config.filterWinRulesDefaults, opts);
         const ids = <Set<GT.HWND>> new Set();
         // console.log('filter_main_hwnd:', arr.length, ref.address(arr[0]));
 
@@ -222,7 +221,7 @@ export function filter_hwnd(arr: GT.HWND[], filterWinRules?: Config.FilterWinRul
             if (ids.has(hWnd)) {
                 continue;
             }
-            if (_filter_hwnd(hWnd, rules)) {
+            if (_filter_hwnd(hWnd, opts)) {
                 ids.add(hWnd);
             }
         }
@@ -235,7 +234,7 @@ export function filter_hwnd(arr: GT.HWND[], filterWinRules?: Config.FilterWinRul
  * filter none top-level window
  * NOTE: not accurate, IME, MESSAGE windows not be filtered out
  */
-function _filter_hwnd(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BOOLEAN {
+function _filter_hwnd(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
     let p = user32.GetParent(hWnd);
     // const addr = ref.address(hWnd);
     //console.log('addr: ', addr + ':' + addr.toString(16));
@@ -248,50 +247,50 @@ function _filter_hwnd(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BOOLEAN {
         return false;
     }
 
-    if ( ! validate_rule_title(hWnd, rules)) {
+    if ( ! validate_rule_title(hWnd, opts)) {
         return false;
     }
-    if ( ! validate_rule_style(hWnd, rules)) {
+    if ( ! validate_rule_style(hWnd, opts)) {
         return false;
     }
-    if ( ! validate_rule_exstyle(hWnd, rules)) {
+    if ( ! validate_rule_exstyle(hWnd, opts)) {
         return false;
     }
 
     return true;
 }
 
-function validate_rule_title(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BOOLEAN {
+function validate_rule_title(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
     const buf = Buffer.alloc(100);
     user32.GetWindowTextW(hWnd, buf, 50);
 
     let title = ref.reinterpretUntilZeros(buf, 2).toString('ucs2');
 
     title && (title = title.trim());
-    if (rules.titleExits === true) {
+    if (opts.titleExits === true) {
         return title ? true : false;
     }
-    else if (rules.titleExits === false) {
+    else if (opts.titleExits === false) {
         return title ? false : true;
     }
 
     return true;    // 'ignore'
 }
 
-function validate_rule_style(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BOOLEAN {
+function validate_rule_style(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
     const dwStyle = user32.GetWindowLongPtrW(hWnd, -16);   // GWL_STYLE
     //console.log('style:', dwStyle);
 
     // if (dwStyle <= 0) {
     //     return false;
     // }
-    if (rules.includeStyle && Number.isSafeInteger(rules.includeStyle)) {
-        if ((dwStyle | rules.includeStyle) !== dwStyle) {
+    if (opts.includeStyle && Number.isSafeInteger(opts.includeStyle)) {
+        if ((dwStyle | opts.includeStyle) !== dwStyle) {
             return false;
         }
     }
-    if (rules.excludeStyle && Number.isSafeInteger(rules.excludeStyle)) {
-        if ((dwStyle | rules.excludeStyle) === dwStyle) {
+    if (opts.excludeStyle && Number.isSafeInteger(opts.excludeStyle)) {
+        if ((dwStyle | opts.excludeStyle) === dwStyle) {
             return false;
         }
     }
@@ -299,7 +298,7 @@ function validate_rule_style(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BO
     return true;
 }
 
-function validate_rule_exstyle(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.BOOLEAN {
+function validate_rule_exstyle(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
     const dwExStyle = user32.GetWindowLongPtrW(hWnd, -20); // GWL_EXSTYLE
     // console.log('dwExstyle:' + dwExStyle);
 
@@ -309,13 +308,13 @@ function validate_rule_exstyle(hWnd: GT.HWND, rules: Config.FilterWinRules): GT.
     // if (dwExStyle && ((dwExStyle | WS_EX_TOOLWINDOW) === dwExStyle)) {
     //     return false;
     // }
-    if (rules.includeExStyle && Number.isSafeInteger(rules.includeExStyle)) {
-        if ((dwExStyle | rules.includeExStyle) !== dwExStyle) {
+    if (opts.includeExStyle && Number.isSafeInteger(opts.includeExStyle)) {
+        if ((dwExStyle | opts.includeExStyle) !== dwExStyle) {
             return false;
         }
     }
-    if (rules.excludeExStyle && Number.isSafeInteger(rules.excludeExStyle)) {
-        if ((dwExStyle | rules.excludeExStyle) === dwExStyle) {
+    if (opts.excludeExStyle && Number.isSafeInteger(opts.excludeExStyle)) {
+        if ((dwExStyle | opts.excludeExStyle) === dwExStyle) {
             return false;
         }
     }
