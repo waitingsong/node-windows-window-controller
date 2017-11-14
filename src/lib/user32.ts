@@ -33,8 +33,7 @@ export const enumWindowsProc = ffi.Callback(
                 const buf = ref.alloc(W.HINSTANCE);
                 const tid = user32.GetWindowThreadProcessId(hWnd, buf);
 
-
-                if ( ! tid) {
+                if (tid) {
                     const pid = buf.readUInt32LE(0);
 
                     if (pid && pid === task.matchValue) {
