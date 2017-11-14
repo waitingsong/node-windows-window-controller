@@ -27,8 +27,6 @@ describe(filename, () => {
         let hWnd: GT.HWND;
         let opts: Config.Opts;
 
-        child = spawn('calc.exe');
-
         beforeEach(async () => {
             opts = <Config.Opts> {...Config.filterWinRulesDefaults};
             await sleep(waitTime);
