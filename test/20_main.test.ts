@@ -27,7 +27,6 @@ describe(filename, () => {
         let opts: Config.Opts;
 
         child = spawn('calc.exe');
-        H.find_n_check_calc_win();
 
         beforeEach(async () => {
             opts = <Config.Opts> {...Config.filterWinRulesDefaults};
