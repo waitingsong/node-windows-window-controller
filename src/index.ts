@@ -193,6 +193,11 @@ export function parse_cli_opts(argv: Config.CliOpts): void | Config.Opts {
         return;
     }
 
+    if (typeof argv.status !== 'undefined') {
+        opts.nCmdShow = +argv.status;
+        console.assert(typeof opts.nCmdShow === 'number', 'nCmdShow must typeof number');
+    }
+
     return opts;
 }
 
