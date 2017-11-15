@@ -56,5 +56,5 @@ export interface CliOpts {
 export interface Opts extends FilterWinRules {
     matchType: matchType;
     matchValue: matchParam;
-    nCmdShow: number;
+    nCmdShow?: number;
 }
