@@ -99,7 +99,7 @@ export const enumWindowsProc = ffi.Callback(
 );
 
 export function validate_cmdshow(nCmdShow: U.constants.CmdShow): boolean {
-    const res = (nCmdShow < 0) ? false : true;
+    const res = (typeof nCmdShow !== 'number' || nCmdShow < 0) ? false : true;
 
     if (!res) {
         console.error('hWnd value invalid: See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx');
