@@ -206,26 +206,21 @@ function get_task_hwnd(task: Config.Task): Promise<GT.HWND[]> {
 
 
 // get hWnd of main top-level window
-export function filter_hwnd(arr: GT.HWND[], opts?: Config.Opts): GT.HWND[]{
-    if (typeof opts === 'undefined') {
-        return [...(new Set(arr).keys())];
-    }
-    else {
-        opts = Object.assign({}, Config.filterWinRulesDefaults, opts);
-        const ids = <Set<GT.HWND>> new Set();
-        // console.log('filter_main_hwnd:', arr.length, ref.address(arr[0]));
+export function filter_hwnd(arr: GT.HWND[], opts: Config.Opts): GT.HWND[]{
+    opts = Object.assign({}, Config.filterWinRulesDefaults, opts);
+    const ids = <Set<GT.HWND>> new Set();
+    // console.log('filter_main_hwnd:', arr.length, ref.address(arr[0]));
 
-        for (const hWnd of arr) {
-            if (ids.has(hWnd)) {
-                continue;
-            }
-            if (_filter_hwnd(hWnd, opts)) {
-                ids.add(hWnd);
-            }
+    for (const hWnd of arr) {
+        if (ids.has(hWnd)) {
+            continue;
         }
-        // console.log('filter_main_hwnd return size', ids.size);
-        return [...ids.keys()];
+        if (_filter_hwnd(hWnd, opts)) {
+            ids.add(hWnd);
+        }
     }
+    // console.log('filter_main_hwnd return size', ids.size);
+    return [...ids.keys()];
 }
 
 /**
