@@ -41,19 +41,19 @@ nwwc --hwnd=0x702C6 --status=1
 
 
 # ------ as module ------
-const api = require("windows-window-controller");
+const nwwc = require("windows-window-controller");
 
-api.hide(0x7632).then(() => console.log('done'));
-api.hide(30258).then(() => console.log('done'));
-api.hide('vim').then(() => console.log('done'));
+nwwc.hide(0x7632).then((execRet) => console.log(execRet));
+nwwc.hide(30258).then((execRet) => console.log(execRet));
+nwwc.hide('vim').then((execRet) => console.log(execRet));
 
 # 2: Activates the window and displays it as a minimized window.
-api.show(0x7632, 2).then(() => console.log('done'));
-api.show(30258, 2).then(() => console.log('done'));
-api.show('vim', 2).then(() => console.log('done'));
+nwwc.show(0x7632, 2).then((execRet) => console.log(execRet));
+nwwc.show(30258, 2).then((execRet) => console.log(execRet));
+nwwc.show('vim', 2).then((execRet) => console.log(execRet));
 
 # hide all windows relative to the main process, such as the window of child process
-api.hide(0x7632, false).then(() => console.log('done'));
+nwwc.hide(0x7632, false).then((execRet) => console.log(execRet));
 ```
 
 ## Dependencies Troubleshooting
