@@ -23,6 +23,7 @@ export const enumWindowsProc = ffi.Callback(
     (hWnd: GT.HWND, lParam: GT.LPARAM): boolean => { // stop loop if return false
         const task = taskConfig.task.get(<number> lParam);
 
+        /* istanbul ignore if  */
         if (!task) {
             console.error('enumWindowsProc() task not exists');
             return true;
@@ -33,6 +34,7 @@ export const enumWindowsProc = ffi.Callback(
                 const buf = ref.alloc(W.HINSTANCE);
                 const tid = user32.GetWindowThreadProcessId(hWnd, buf);
 
+                /* istanbul ignore else */ 
                 if (tid) {
                     const pid = buf.readUInt32LE(0);
 
@@ -52,6 +54,7 @@ export const enumWindowsProc = ffi.Callback(
             }
 
             case 'title':
+                /* istanbul ignore else */ 
                 if (task.matchValue) {
                     const buf = Buffer.alloc(254);
                     const len = user32.GetWindowTextW(hWnd, buf, 254);
@@ -86,7 +89,7 @@ export const enumWindowsProc = ffi.Callback(
                     task.hwndSet.add(hWnd);
                 }
                 break;
-
+            /* istanbul ignore next */
             default:
                 return true;
         }
@@ -170,6 +173,7 @@ function _get_hwnds(task: Config.Task): Promise<GT.HWND[] | void> {
         case 'hwnd':
             // void
             break;
+        /* istanbul ignore next */
         default:
             throw new Error('task.matchType value invalid');
     }

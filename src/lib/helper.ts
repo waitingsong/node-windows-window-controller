@@ -8,6 +8,7 @@ export function get_last_err_msg(): string {
     const errcode = knl32.GetLastError();
     let errMsg = '';
 
+    /* istanbul ignore if  */
     if (errcode) {
         const len = 255;
         const buf = Buffer.alloc(len);
