@@ -46,6 +46,7 @@ describe(filename, () => {
         });
         afterEach(async () => {
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('should hidden', async function() {
@@ -59,7 +60,8 @@ describe(filename, () => {
                     assert( ! code, 'process exit without zero');
                 });
 
-                await sleep(waitTime);
+                await sleep(waitTimeLong);
+                await sleep(waitTimeLong);
                 assert(!user32.IsWindowVisible(hWnd), 'window should invisible');
             }
             catch (ex) {
@@ -78,7 +80,8 @@ describe(filename, () => {
                     assert( ! code, 'process exit without zero');
                 });
 
-                await sleep(waitTime);
+                await sleep(waitTimeLong);
+                await sleep(waitTimeLong);
                 assert(!!user32.IsWindowVisible(hWnd), 'window should still visible');
             }
             catch (ex) {

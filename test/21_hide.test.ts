@@ -37,6 +37,7 @@ describe(filename, () => {
         afterEach(async () => {
             await sleep(waitTime);
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('--pid', async function() {

@@ -38,6 +38,7 @@ describe(filename, () => {
             assert(!user32.IsWindowVisible(hWnd), 'beforeEach: window should invisible');
         });
         afterEach(async () => {
+            await sleep(waitTime);
             child && child.kill();
             await sleep(waitTime);
         });

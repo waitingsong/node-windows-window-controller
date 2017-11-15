@@ -60,7 +60,7 @@ describe(filename, () => {
                     assert( ! code, 'kill process exit without zero');
                 });
 
-                await sleep(waitTime);
+                await sleep(waitTimeLong);
                 opts.matchType = 'title';
                 opts.matchValue = title;
                 const arr = await nwwc.get_hwnds(opts);
@@ -85,7 +85,7 @@ describe(filename, () => {
                     assert( ! code, 'kill process exit without zero');
                 });
 
-                await sleep(waitTime);
+                await sleep(waitTimeLong);
                 opts.matchType = 'title';
                 opts.matchValue = title;
                 const arr = await nwwc.get_hwnds(opts);
