@@ -212,9 +212,11 @@ export function filter_hwnd(arr: GT.HWND[], opts: Config.Opts): GT.HWND[]{
     // console.log('filter_main_hwnd:', arr.length, ref.address(arr[0]));
 
     for (const hWnd of arr) {
+        /* istanbul ignore if  */
         if (ids.has(hWnd)) {
             continue;
         }
+        /* istanbul ignore else  */
         if (_filter_hwnd(hWnd, opts)) {
             ids.add(hWnd);
         }
@@ -236,16 +238,20 @@ function _filter_hwnd(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
         return false;
     }
     p = user32.GetWindow(hWnd, 4);  // GW_OWNER==4
+    /* istanbul ignore else  */
     if ( ! ref.isNull(p)) {
         return false;
     }
 
+    /* istanbul ignore else  */
     if ( ! validate_rule_title(hWnd, opts)) {
         return false;
     }
+    /* istanbul ignore else  */
     if ( ! validate_rule_style(hWnd, opts)) {
         return false;
     }
+    /* istanbul ignore else  */
     if ( ! validate_rule_exstyle(hWnd, opts)) {
         return false;
     }
@@ -280,11 +286,13 @@ function validate_rule_style(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
     // if (dwStyle <= 0) {
     //     return false;
     // }
+    /* istanbul ignore else  */
     if (opts.includeStyle && Number.isSafeInteger(opts.includeStyle)) {
         if ((dwStyle | opts.includeStyle) !== dwStyle) {
             return false;
         }
     }
+    /* istanbul ignore else  */
     if (opts.excludeStyle && Number.isSafeInteger(opts.excludeStyle)) {
         if ((dwStyle | opts.excludeStyle) === dwStyle) {
             return false;
@@ -307,12 +315,15 @@ function validate_rule_exstyle(hWnd: GT.HWND, opts: Config.Opts): GT.BOOLEAN {
     // if (dwExStyle && ((dwExStyle | WS_EX_TOOLWINDOW) === dwExStyle)) {
     //     return false;
     // }
+    /* istanbul ignore else  */
     if (opts.includeExStyle && Number.isSafeInteger(opts.includeExStyle)) {
         if ((dwExStyle | opts.includeExStyle) !== dwExStyle) {
             return false;
         }
     }
+    /* istanbul ignore else  */
     if (opts.excludeExStyle && Number.isSafeInteger(opts.excludeExStyle)) {
+        /* istanbul ignore else  */
         if ((dwExStyle | opts.excludeExStyle) === dwExStyle) {
             return false;
         }
