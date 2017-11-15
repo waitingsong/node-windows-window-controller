@@ -46,7 +46,9 @@ describe(filename, () => {
             await sleep(waitTime);
         });
         afterEach(async () => {
+            await sleep(waitTime);
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('should hidden', function(done) {
@@ -111,7 +113,9 @@ describe(filename, () => {
             await sleep(waitTime);
         });
         afterEach(async () => {
+            await sleep(waitTime);
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('should shown', function(done) {
