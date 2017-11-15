@@ -36,7 +36,8 @@
       "**/*.test.ts",
       "**/*.d.ts",
       "test",
-      "dist/bin"
+      "dist",
+      "src/bin"
     ],
     "extension": [
       ".ts",
