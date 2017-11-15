@@ -9,7 +9,7 @@
     "hide-window": "./dist/bin/hide-window.js"
   },
   "scripts": {
-    "build": "npm run test && npm run clean && npm run build:ts && npm run jslint",
+    "build": "npm run clean && npm run build:ts && npm run jslint",
     "build:ts": "tsc -p ./ --outDir dist/",
     "clean": "rm -rf dist/*",
     "cov": "nyc mocha",
