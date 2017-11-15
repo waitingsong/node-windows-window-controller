@@ -26,6 +26,7 @@ export function find_n_check_calc_win(): GT.HWND {
     if (hWnd && !ref.isNull(hWnd) && ref.address(hWnd)) {
         assert(true);
         change_title(hWnd, title);
+        assert(!!user32.IsWindowVisible(hWnd), 'find_n_check_calc_win: window should visible');
     }
     else {
         assert(false, 'found no calc window, GetLastError: ' + knl32.GetLastError());

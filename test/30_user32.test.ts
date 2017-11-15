@@ -61,7 +61,6 @@ describe(filename, () => {
             child = spawn('calc.exe');
             await sleep(waitTime);
             hWnd = H.find_n_check_calc_win();
-            assert(!!user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             await sleep(waitTime);
         });
         afterEach(async () => {
@@ -109,7 +108,6 @@ describe(filename, () => {
             child = spawn('calc.exe');
             await sleep(waitTime);
             hWnd = H.find_n_check_calc_win();
-            assert(!!user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             await nwwc.hide({...opts, matchType: 'title', matchValue: title});
             await sleep(waitTime);
             assert(!user32.IsWindowVisible(hWnd), 'beforeEach: window should invisible');
@@ -153,7 +151,6 @@ describe(filename, () => {
             child = spawn('calc.exe');
             await sleep(waitTime);
             hWnd = H.find_n_check_calc_win();
-            assert(!!user32.IsWindowVisible(hWnd), 'beforeEach: window should visible');
             await sleep(waitTime);
         });
         afterEach(async () => {
