@@ -201,4 +201,28 @@ export function parse_cli_opts(argv: Config.CliOpts): void | Config.Opts {
     return opts;
 }
 
+// user32.SetWindowTextW()
+export function set_title(title: string, opts: Config.Opts): Promise<Config.ExecRet> {
+    const execRet = init_execret();
+
+    return get_hwnds(opts).then(hWnds => {
+        const buf = Buffer.from(title.trim() + '\0', 'ucs2');
+
+        if (hWnds && hWnds.length) {
+            for (const hWnd of hWnds) {
+                if (hWnd && !ref.isNull(hWnd)) {
+                    user32.SetWindowTextW(hWnd, buf);
+                    execRet.hwnds.push(ref.address(hWnd));
+                }
+            }
+        }
+    })
+        .catch(err => {
+            execRet.err = 1;
+            execRet.msg += err.toString();
+        })
+        .then(() => execRet);
+
+}
+
 export default show;
