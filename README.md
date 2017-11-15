@@ -36,11 +36,6 @@ show-window --pid=0x7632 --status=3
 show-window --pid=30258 --status=3
 show-window --title=vim --status=3
 
-# ------  original user32.ShowWindow ------
-# 0: Hides the window and activates another window.
-nwwc --hwnd=0x702C6 --status=0
-nwwc --hwnd=459462 --status=0
-
 # 1: Activates and displays a window. If the window is minimized or maximized, the system restores it to its original size and position. An application should specify this flag when displaying the window for the first time.
 nwwc --hwnd=0x702C6 --status=1
 
