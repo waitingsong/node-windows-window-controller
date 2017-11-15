@@ -40,6 +40,7 @@ describe(filename, () => {
         afterEach(async () => {
             await sleep(waitTime);
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('--title', async function() {
@@ -66,6 +67,7 @@ describe(filename, () => {
             await sleep(waitTime);
         });
         afterEach(async () => {
+            await sleep(waitTime);
             child && child.kill();
             await sleep(waitTime);
         });
@@ -111,6 +113,7 @@ describe(filename, () => {
         afterEach(async () => {
             await sleep(waitTime);
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('should find hWnd', async function() {
@@ -159,6 +162,7 @@ describe(filename, () => {
         afterEach(async () => {
             await sleep(waitTime);
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('by valid pid', async function() {
@@ -240,6 +244,5 @@ describe(filename, () => {
         });
 
     });
-
 
 });

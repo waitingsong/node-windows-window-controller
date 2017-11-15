@@ -66,6 +66,7 @@ describe(filename, () => {
         afterEach(async () => {
             await sleep(waitTime);
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('by valid hwnd value', async function() {
@@ -113,6 +114,7 @@ describe(filename, () => {
             assert(!user32.IsWindowVisible(hWnd), 'beforeEach: window should invisible');
         });
         afterEach(async () => {
+            await sleep(waitTime);
             child && child.kill();
             await sleep(waitTime);
         });
@@ -156,6 +158,7 @@ describe(filename, () => {
         afterEach(async () => {
             await sleep(waitTime);
             child && child.kill();
+            await sleep(waitTime);
         });
 
         it('matched by pid', async function() {
