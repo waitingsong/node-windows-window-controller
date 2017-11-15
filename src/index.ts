@@ -45,7 +45,7 @@ export function show(options: Config.Opts): Promise<Config.ExecRet> {
 function proxy(opts: Config.Opts): Promise<Config.ExecRet> {
     const execRet = init_execret();
 
-    if ( ! u32.validate_cmdshow(opts.nCmdShow)) {
+    if (typeof opts.nCmdShow === 'undefined' || ! u32.validate_cmdshow(opts.nCmdShow)) {
         execRet.err = 1;
         execRet.msg = 'value of nCmdShow invalid';
         return Promise.resolve(execRet);
@@ -56,7 +56,7 @@ function proxy(opts: Config.Opts): Promise<Config.ExecRet> {
                 for (const hWnd of hWnds) {
                     if (hWnd && !ref.isNull(hWnd)) {
                         // console.log('hWnd addr:', ref.address(hWnd));
-                        u32.show_hide_one(hWnd, opts.nCmdShow)
+                        u32.show_hide_one(hWnd, <number> opts.nCmdShow)
                             .then((hWnd) => hWnd && !ref.isNull(hWnd) && execRet.hwnds.push(ref.address(hWnd)))
                             .catch((err: Error) => {
                                 execRet.err = 1;

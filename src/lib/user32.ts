@@ -34,7 +34,7 @@ export const enumWindowsProc = ffi.Callback(
                 const buf = ref.alloc(W.HINSTANCE);
                 const tid = user32.GetWindowThreadProcessId(hWnd, buf);
 
-                /* istanbul ignore else */ 
+                /* istanbul ignore else */
                 if (tid) {
                     const pid = buf.readUInt32LE(0);
 
@@ -54,7 +54,7 @@ export const enumWindowsProc = ffi.Callback(
             }
 
             case 'title':
-                /* istanbul ignore else */ 
+                /* istanbul ignore else */
                 if (task.matchValue) {
                     const buf = Buffer.alloc(254);
                     const len = user32.GetWindowTextW(hWnd, buf, 254);
@@ -98,7 +98,7 @@ export const enumWindowsProc = ffi.Callback(
     }
 );
 
-export function validate_cmdshow(nCmdShow: U.constants.CmdShow): boolean {
+export function validate_cmdshow(nCmdShow: U.constants.CmdShow | void): boolean {
     const res = (typeof nCmdShow !== 'number' || nCmdShow < 0) ? false : true;
 
     if (!res) {
