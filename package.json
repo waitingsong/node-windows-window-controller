@@ -69,7 +69,7 @@
   ],
   "dependencies": {
     "ffi": "^2.2.0",
-    "win32-api": "^1.11.0",
+    "win32-api": "^2.0.0",
     "yargs": "^10.0.3"
   },
   "devDependencies": {
