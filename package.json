@@ -1,9 +1,18 @@
 {
-  "name": "npm-base",
+  "name": "windows-window-controller",
   "author": "waiting",
-  "version": "0.0.1",
-  "description": "npm boilerplate",
-  "keywords": [],
+  "version": "3.1.1",
+  "description": "controll window by calling user32.ShowWindow from node via node-ffi",
+  "keywords": [
+    "window",
+    "windows api",
+    "ShowWindow",
+    "show window",
+    "hide window",
+    "maximize window",
+    "minimize window",
+    "隐藏窗口"
+  ],
   "engines": {
     "node": ">=8.10.0"
   },
@@ -12,13 +21,18 @@
   "main": "./dist/index.cjs.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "bugs": {
-    "url": "https://github.com/waitingsong/npm-base/issues"
+  "bin": {
+    "nwwc": "./dist/bin/nwwc.js",
+    "show-window": "./dist/bin/show-window.js",
+    "hide-window": "./dist/bin/hide-window.js"
   },
-  "homepage": "https://github.com/waitingsong/npm-base#readme",
+  "bugs": {
+    "url": "https://github.com/waitingsong/node-windows-window-controller/issues"
+  },
+  "homepage": "https://github.com/waitingsong/node-windows-window-controller#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/waitingsong/npm-base.git"
+    "url": "git+https://github.com/waitingsong/node-windows-window-controller.git"
   },
   "license": "MIT",
   "nyc": {
@@ -40,11 +54,21 @@
     ],
     "all": true
   },
-  "dependencies": {},
+  "os": [
+    "win32"
+  ],
+  "dependencies": {
+    "ffi": "^2.2.0",
+    "win32-api": "^3.0.1",
+    "yargs": "^10.0.3"
+  },
   "devDependencies": {
+    "@types/ffi": "^0.0.19",
     "@types/mocha": "^5.2.2",
     "@types/node": "^10.3.2",
     "@types/power-assert": "^1.5.0",
+    "@types/ref": "^0.0.28",
+    "@types/ref-struct": "^0.0.28",
     "@types/rewire": "^2.5.28",
     "@types/rimraf": "^2.0.2",
     "@types/yargs": "^11.0.0",
@@ -89,3 +113,4 @@
     "tsc:w": "tsc -p tsconfig.json -w"
   }
 }
+
