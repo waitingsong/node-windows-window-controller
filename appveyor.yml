@@ -1,6 +1,9 @@
 clone_folder: c:\projects\myproject
 shallow_clone: true
 
+image:
+  - Visual Studio 2015
+
 init:
   - git config --global core.autocrlf input
 
