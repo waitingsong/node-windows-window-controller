@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * show or hide window(s)
  * arguments:

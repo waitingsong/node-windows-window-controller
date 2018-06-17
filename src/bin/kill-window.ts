@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * kill process by which the matched hWnd(s) (window) created
  * optins:
