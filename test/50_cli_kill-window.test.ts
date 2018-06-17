@@ -1,8 +1,9 @@
 /// <reference types="node" />
 /// <reference types="mocha" />
 
+// need run build before test!
+
 import { spawn, ChildProcess } from 'child_process'
-import * as ffi from 'ffi'
 // tslint:disable-next-line
 import * as sleep from 'mz-modules/sleep'
 import { basename, normalize } from 'path'
