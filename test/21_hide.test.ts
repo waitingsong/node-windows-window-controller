@@ -2,6 +2,7 @@
 /// <reference types="mocha" />
 
 import { spawn, ChildProcess } from 'child_process'
+// tslint:disable-next-line
 import * as sleep from 'mz-modules/sleep'
 import { basename } from 'path'
 import * as assert from 'power-assert'
