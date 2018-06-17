@@ -1,9 +1,6 @@
 /// <reference types="node" />
 /// <reference types="mocha" />
 
-import { spawn, ChildProcess } from 'child_process'
-import { reverse } from 'dns'
-import { basename, normalize } from 'path'
 import * as assert from 'power-assert'
 import * as ref from 'ref'
 import {
@@ -14,10 +11,10 @@ import {
 
 import * as Config from '../src/lib/types'
 
+
 const knl32 = Kernel32.load()
 const user32 = User32.load()
 const calcTitle = 'Node-Calculator'
-
 
 export function find_n_check_calc_win(): M.HWND {
   const lpszClass = Buffer.from('CalcFrame\0', 'ucs2')
