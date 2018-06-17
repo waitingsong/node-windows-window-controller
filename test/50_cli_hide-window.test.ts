@@ -42,7 +42,7 @@ describe(filename, () => {
       await sleep(waitTime)
     })
 
-    it.only('should hidden', async () => {
+    it('should hidden', async () => {
       try {
         const hide = spawn('node', [js, '--title=' + title], defaults)
 
