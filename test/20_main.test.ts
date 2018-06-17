@@ -6,20 +6,17 @@ import * as sleep from 'mz-modules/sleep'
 import { basename } from 'path'
 import * as assert from 'power-assert'
 import * as ref from 'ref'
-import { DModel as M, K, U } from 'win32-api'
+import { DModel as M } from 'win32-api'
 
 import * as nwwc from '../src/index'
 import * as Config from '../src/lib/types'
 
 import * as H from './helper'
 
+
 const filename = basename(__filename)
-const knl32 = K.load()
-const user32 = U.load()
 const title = 'Node-Calculator'
-const waitTimeLong = '3s'
 const waitTime = '1s'
-const UC = U.constants
 
 describe(filename, () => {
   // for run calc.exe first
