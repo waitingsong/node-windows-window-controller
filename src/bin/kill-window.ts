@@ -14,13 +14,13 @@ import * as nwwc from '../index'
 
 const opts = nwwc.parse_cli_opts(yargs.argv)
 
-if (! opts) {
+if (!opts) {
   console.error('argv empty. options: --title or --pid')
   process.exit(1)
 }
 else {
   nwwc.kill(opts).then((execRet: nwwc.ExecRet) => {
-      console.log('process ret:', execRet)
-      process.exit(execRet.err)
-    })
+    console.info('process ret:', execRet)
+    process.exit(execRet.err)
+  })
 }
