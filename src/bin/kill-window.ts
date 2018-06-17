@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
  * kill process by which the matched hWnd(s) (window) created
  * optins:
@@ -8,18 +6,20 @@
  * --hwnd={integer}
  */
 
-import * as yargs from 'yargs';
-import * as nwwc from '../index';
+import * as yargs from 'yargs'
 
-const opts = nwwc.parse_cli_opts(yargs.argv);
+import { kill, parse_cli_opts } from '../lib/index'
+import { ExecRet } from '../lib/types'
 
-if (! opts) {
-    console.error('argv empty. options: --title or --pid');
-    process.exit(1);
+const opts = parse_cli_opts(yargs.argv)
+
+if (!opts) {
+  console.error('argv empty. options: --title or --pid')
+  process.exit(1)
 }
 else {
-    nwwc.kill(opts).then((execRet: nwwc.ExecRet) => {
-        console.log('process ret:', execRet);
-        process.exit(execRet.err);
-    });
+  kill(opts).then((execRet: ExecRet) => {
+    console.info('process ret:', execRet)
+    process.exit(execRet.err)
+  })
 }
