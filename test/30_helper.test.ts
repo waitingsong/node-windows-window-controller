@@ -42,7 +42,7 @@ describe(filename, () => {
     it('should no error', async () => {
       opts.matchType = 'title'
       opts.matchValue = title
-      const execRet = await nwwc.hide(opts)
+      await nwwc.hide(opts)
       const lastErrMsg = helper.get_last_err_msg()
 
       if (lastErrMsg) {

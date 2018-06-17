@@ -216,7 +216,7 @@ describe(filename, () => {
       opts.matchType = 'hwnd'
       opts.matchValue = hwnd
       opts.nCmdShow = 0
-      const execRet = await nwwc.hide(opts)
+      await nwwc.hide(opts)
 
       assert(!user32.IsWindowVisible(hWnd), 'window should invisible')
     })
@@ -226,7 +226,7 @@ describe(filename, () => {
       opts.matchType = 'hwnd'
       opts.matchValue = hwnd
       opts.nCmdShow = 0
-      const execRet = await nwwc.hide(opts)
+      await nwwc.hide(opts)
 
       assert(!!user32.IsWindowVisible(hWnd), 'window should visible')
     })

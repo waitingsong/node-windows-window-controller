@@ -99,7 +99,7 @@ describe(filename, () => {
       opts.matchValue = child.pid
       opts.nCmdShow = 9
       try {
-        const execRet = await nwwc.show(opts)
+        await nwwc.show(opts)
 
         assert(user32.IsWindowVisible(hWnd), 'window should visible')
       }
@@ -166,7 +166,7 @@ describe(filename, () => {
       opts.matchValue = child.pid
       opts.nCmdShow = 9
       try {
-        const execRet = await nwwc.show(opts)
+        await nwwc.show(opts)
 
         assert(user32.IsWindowVisible(hWnd), 'window should visible')
       }
@@ -182,7 +182,7 @@ describe(filename, () => {
       opts.matchType = 'hwnd'
       opts.matchValue = hwnd
       opts.nCmdShow = 2
-      const execRet = await nwwc.show(opts)
+      await nwwc.show(opts)
 
       assert(!!user32.IsWindowVisible(hWnd), 'window should visible')
     })
@@ -192,7 +192,7 @@ describe(filename, () => {
       opts.matchType = 'hwnd'
       opts.matchValue = hwnd
       opts.nCmdShow = 2
-      const execRet = await nwwc.show(opts)
+      await nwwc.show(opts)
 
       assert(!user32.IsWindowVisible(hWnd), 'window should invisible')
     })
