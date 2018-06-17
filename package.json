@@ -24,7 +24,8 @@
   "bin": {
     "nwwc": "./dist/bin/nwwc.js",
     "show-window": "./dist/bin/show-window.js",
-    "hide-window": "./dist/bin/hide-window.js"
+    "hide-window": "./dist/bin/hide-window.js",
+    "kill-window": "./dist/bin/kill-window.js"
   },
   "bugs": {
     "url": "https://github.com/waitingsong/node-windows-window-controller/issues"
