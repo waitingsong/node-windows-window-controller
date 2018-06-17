@@ -9,6 +9,8 @@
     "hide-window": "./dist/bin/hide-window.js"
   },
   "scripts": {
+    "bp:add": "git remote add bp https://github.com/waitingsong/npm-base",
+    "bp:sync": "git fetch bp && git pull --no-edit bp master",
     "build": "npm run clean && npm run build:ts && npm run jslint",
     "build:ts": "tsc -p ./ --outDir dist/",
     "clean": "rm -rf dist/*",
