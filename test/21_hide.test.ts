@@ -1,13 +1,12 @@
 /// <reference types="node" />
 /// <reference types="mocha" />
 
-import { fail } from 'assert'
 import { spawn, ChildProcess } from 'child_process'
 import * as sleep from 'mz-modules/sleep'
-import { basename, normalize } from 'path'
+import { basename } from 'path'
 import * as assert from 'power-assert'
 import * as ref from 'ref'
-import { conf, conf as GCF, types as GT, windef as WD } from 'win32-api'
+import { DModel as M, U } from 'win32-api'
 
 import * as nwwc from '../src/index'
 import * as Config from '../src/lib/types'
@@ -15,18 +14,15 @@ import * as Config from '../src/lib/types'
 import * as H from './helper'
 
 const filename = basename(__filename)
-const Win = nwwc.Win
-const knl32 = Win.Kernel32.load()
-const user32 = Win.User32.load()
+const user32 = U.load()
 const title = 'Node-Calculator'
-const waitTimeLong = '3s'
 const waitTime = '1s'
-const UC = Win.User32.constants
+const UC = U.constants
 
 describe(filename, () => {
   describe('Should hide() works', () => {
     let child: ChildProcess
-    let hWnd: GT.HWND
+    let hWnd: M.HWND
     let opts: Config.Opts
 
     beforeEach(async () => {
@@ -42,7 +38,7 @@ describe(filename, () => {
       await sleep(waitTime)
     })
 
-    it('--pid', async function() {
+    it('--pid', async () => {
       try {
         opts.matchType = 'pid'
         opts.matchValue = child.pid
@@ -57,7 +53,7 @@ describe(filename, () => {
       }
     })
 
-    it('--pid with titleExits true', async function() {
+    it('--pid with titleExits true', async () => {
       opts.titleExits = true    // win should processed by it
       opts.matchType = 'pid'
       opts.matchValue = child.pid
@@ -73,7 +69,7 @@ describe(filename, () => {
         assert(false, ex)
       }
     })
-    it('--pid with titleExists false', async function() {
+    it('--pid with titleExists false', async () => {
       opts.titleExits = false   // win should not processed by it
       opts.matchType = 'pid'
       opts.matchValue = child.pid
@@ -89,7 +85,7 @@ describe(filename, () => {
       }
     })
 
-    it('--pid with includeStyle:WS_SYSMENU', async function() {
+    it('--pid with includeStyle:WS_SYSMENU', async () => {
       opts.includeStyle = UC.WS_SYSMENU
       opts.matchType = 'pid'
       opts.matchValue = child.pid
@@ -104,7 +100,7 @@ describe(filename, () => {
         assert(false, ex)
       }
     })
-    it('--pid with excludeStyle:WS_SYSMENU', async function() {
+    it('--pid with excludeStyle:WS_SYSMENU', async () => {
       opts.excludeStyle = UC.WS_SYSMENU
       opts.matchType = 'pid'
       opts.matchValue = child.pid
@@ -120,7 +116,7 @@ describe(filename, () => {
       }
     })
 
-    it('--pid with includeStyle:WS_VISIBLE', async function() {
+    it('--pid with includeStyle:WS_VISIBLE', async () => {
       opts.includeStyle = UC.WS_VISIBLE // win should processed by it
       opts.matchType = 'pid'
       opts.matchValue = child.pid
@@ -135,7 +131,7 @@ describe(filename, () => {
         assert(false, ex)
       }
     })
-    it('--pid with excludeStyle:WS_VISIBLE', async function() {
+    it('--pid with excludeStyle:WS_VISIBLE', async () => {
       opts.excludeStyle = UC.WS_VISIBLE // win should not processed by it
       opts.matchType = 'pid'
       opts.matchValue = child.pid
@@ -151,7 +147,7 @@ describe(filename, () => {
       }
     })
 
-    it('--pid with includeExStyle:WS_EX_TOOLWINDOW', async function() {
+    it('--pid with includeExStyle:WS_EX_TOOLWINDOW', async () => {
       opts.includeExStyle = UC.WS_EX_TOOLWINDOW // calculator has no style of WS_EX_TOOLWINDOW
       opts.matchType = 'pid'
       opts.matchValue = child.pid
@@ -166,7 +162,7 @@ describe(filename, () => {
         assert(false, ex)
       }
     })
-    it('--pid with excludeExStyle:WS_EX_TOOLWINDOW', async function() {
+    it('--pid with excludeExStyle:WS_EX_TOOLWINDOW', async () => {
       opts.excludeExStyle = UC.WS_EX_TOOLWINDOW // calculator has no style of WS_EX_TOOLWINDOW
       opts.matchType = 'pid'
       opts.matchValue = child.pid
@@ -182,7 +178,7 @@ describe(filename, () => {
       }
     })
 
-    it('--title', async function() {
+    it('--title', async () => {
       opts.matchType = 'title'
       opts.matchValue = title
       const execRet = await nwwc.hide(opts)
@@ -192,7 +188,7 @@ describe(filename, () => {
       assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"')
     })
 
-    it('--title with titleExists true', async function() {
+    it('--title with titleExists true', async () => {
       opts.titleExits = true
       opts.matchType = 'title'
       opts.matchValue = title
@@ -202,7 +198,7 @@ describe(filename, () => {
       const visible = !!user32.IsWindowVisible(hWnd)
       assert(!visible, ': window should invisible, processed hWnds are "' + execRet.hwnds.join(',') + '"')
     })
-    it('--title with titleExists false', async function() {
+    it('--title with titleExists false', async () => {
       opts.titleExits = false
       opts.matchType = 'title'
       opts.matchValue = title
@@ -213,7 +209,7 @@ describe(filename, () => {
       assert(visible, ': window should visible, processed hWnds are "' + execRet.hwnds.join(',') + '"')
     })
 
-    it('--hwnd by valid value', async function() {
+    it('--hwnd by valid value', async () => {
       const hwnd = ref.address(hWnd)
 
       opts.matchType = 'hwnd'
@@ -223,7 +219,7 @@ describe(filename, () => {
 
       assert(!user32.IsWindowVisible(hWnd), 'window should invisible')
     })
-    it('--hwnd by invalid value', async function() {
+    it('--hwnd by invalid value', async () => {
       const hwnd = 0
 
       opts.matchType = 'hwnd'
