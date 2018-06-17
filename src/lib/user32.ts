@@ -1,6 +1,11 @@
 import * as ffi from 'ffi'
 import * as ref from 'ref'
-import {conf as GCF, windef as W, DModel as M, U } from 'win32-api'
+import {
+  Config as GCF,
+  DModel as M,
+  DTypes as W,
+  U,
+} from 'win32-api'
 
 import * as H from './helper'
 import * as Config from './types'
@@ -65,10 +70,10 @@ export const enumWindowsProc = ffi.Callback(
             // const visible = user32.IsWindowVisible(hWnd);
 
             if (name.indexOf(<string> task.matchValue) !== -1) {
-              const buf = Buffer.alloc(4)
+              const buf2 = Buffer.alloc(4)
 
-              user32.GetWindowThreadProcessId(hWnd, buf)
-              task.pidSet.add(buf.readUIntLE(0, 4))
+              user32.GetWindowThreadProcessId(hWnd, buf2)
+              task.pidSet.add(buf2.readUIntLE(0, 4))
               task.hwndSet.add(hWnd)
             }
           }
@@ -103,6 +108,7 @@ export function validate_cmdshow(nCmdShow: U.constants.CmdShow | void): boolean 
   const res = (typeof nCmdShow !== 'number' || nCmdShow < 0) ? false : true
 
   if (!res) {
+    // tslint:disable-next-line
     console.error('hWnd value invalid: See: https://msdn.microsoft.com/en-us/library/windows/desktop/ms633548(v=vs.85).aspx')
   }
   return res
@@ -289,12 +295,14 @@ function validate_rule_style(hWnd: M.HWND, opts: Config.Opts): M.BOOLEAN {
   // }
   /* istanbul ignore else  */
   if (opts.includeStyle && Number.isSafeInteger(opts.includeStyle)) {
+    // tslint:disable-next-line:no-bitwise
     if ((dwStyle | opts.includeStyle) !== dwStyle) {
       return false
     }
   }
   /* istanbul ignore else  */
   if (opts.excludeStyle && Number.isSafeInteger(opts.excludeStyle)) {
+    // tslint:disable-next-line:no-bitwise
     if ((dwStyle | opts.excludeStyle) === dwStyle) {
       return false
     }
@@ -318,6 +326,7 @@ function validate_rule_exstyle(hWnd: M.HWND, opts: Config.Opts): M.BOOLEAN {
   // }
   /* istanbul ignore else  */
   if (opts.includeExStyle && Number.isSafeInteger(opts.includeExStyle)) {
+    // tslint:disable-next-line:no-bitwise
     if ((dwExStyle | opts.includeExStyle) !== dwExStyle) {
       return false
     }
@@ -325,6 +334,7 @@ function validate_rule_exstyle(hWnd: M.HWND, opts: Config.Opts): M.BOOLEAN {
   /* istanbul ignore else  */
   if (opts.excludeExStyle && Number.isSafeInteger(opts.excludeExStyle)) {
     /* istanbul ignore else  */
+    // tslint:disable-next-line:no-bitwise
     if ((dwExStyle | opts.excludeExStyle) === dwExStyle) {
       return false
     }
