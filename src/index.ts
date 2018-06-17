@@ -17,8 +17,6 @@ export { Config }
 export { ExecRet } from './lib/types'
 export { validate_cmdshow } from './lib/user32'
 
-const isWin32: boolean = process.platform === 'win32'
-const plateformError = 'Invalid platform: win32 required'
 const user32 = U.load()
 
 // hide the window(s)
