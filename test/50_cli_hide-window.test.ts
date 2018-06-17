@@ -2,12 +2,12 @@
 /// <reference types="mocha" />
 
 import { spawn, ChildProcess } from 'child_process'
+// tslint:disable-next-line
 import * as sleep from 'mz-modules/sleep'
 import { basename, normalize } from 'path'
 import * as assert from 'power-assert'
 import { DModel as M, U } from 'win32-api'
 
-import * as nwwc from '../src/index'
 import * as Config from '../src/lib/types'
 
 import * as H from './helper'
@@ -42,7 +42,7 @@ describe(filename, () => {
       await sleep(waitTime)
     })
 
-    it('should hidden', async () => {
+    it.only('should hidden', async () => {
       try {
         const hide = spawn('node', [js, '--title=' + title], defaults)
 
@@ -83,6 +83,5 @@ describe(filename, () => {
     })
 
   })
-
 
 })
