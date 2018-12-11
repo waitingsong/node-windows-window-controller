@@ -17,7 +17,7 @@ import * as H from './helper'
 const filename = basename(__filename)
 const user32 = U.load()
 const title = 'Node-Calculator'
-const waitTime = '1s'
+const waitTime = '2s'
 const UC = U.constants
 
 describe(filename, () => {
