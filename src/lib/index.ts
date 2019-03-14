@@ -125,7 +125,8 @@ export function kill(opts: Config.Opts): Promise<Config.ExecRet> {
 
 function _kill(pid: FM.PID): boolean {
   try {
-    process.kill(pid, 0) && process.kill(pid)
+    process.kill(pid, 0)
+    process.kill(pid)
     return true
   }
   catch (ex) {
