@@ -1,9 +1,6 @@
 clone_folder: c:\projects\myproject
 shallow_clone: true
 
-image:
-  - Visual Studio 2015
-
 init:
   - git config --global core.autocrlf input
 
@@ -23,10 +20,12 @@ platform:
 
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
-  - npm i -g rollup
+  - npm root -g
+  - npm i rollup typescript eslint nyc
   - npm install
 
 test_script:
+  - openssl version
   - node --version
   - npm --version
   - npm run build
