@@ -46,18 +46,19 @@ describe(filename, () => {
       try {
         const hideProc = spawn('node', [js, `--title=${title}`, '--status=0'], defaults)
 
-        hideProc.stderr.on('data', data => {
-          assert(false, data.toString())
-        })
-        // hide.stdout.on('data', data => {
-        //     console.log(data.toString());
-        // });
-        hideProc.on('exit', code => {
-          assert(!code, 'process exit without zero')
-          assert(!user32.IsWindowVisible(hWnd), 'window should invisible')
-          done()
-        })
-
+        if (hideProc.stderr) {
+          hideProc.stderr.on('data', data => {
+            assert(false, data.toString())
+          })
+          // hide.stdout.on('data', data => {
+          //     console.log(data.toString());
+          // });
+          hideProc.on('exit', code => {
+            assert(!code, 'process exit without zero')
+            assert(!user32.IsWindowVisible(hWnd), 'window should invisible')
+            done()
+          })
+        }
       }
       catch (ex) {
         assert(false, ex)
@@ -67,14 +68,16 @@ describe(filename, () => {
       try {
         const hideProc = spawn('node', [js, `--title=fake-${title}`, '--status=0'], defaults)
 
-        hideProc.stderr.on('data', data => {
-          assert(false, data.toString())
-        })
-        hideProc.on('exit', code => {
-          assert(!code, 'process exit without zero')
-          assert(!!user32.IsWindowVisible(hWnd), 'window should still visible')
-          done()
-        })
+        if (hideProc.stderr) {
+          hideProc.stderr.on('data', data => {
+            assert(false, data.toString())
+          })
+          hideProc.on('exit', code => {
+            assert(!code, 'process exit without zero')
+            assert(!!user32.IsWindowVisible(hWnd), 'window should still visible')
+            done()
+          })
+        }
       }
       catch (ex) {
         assert(false, ex)
@@ -113,17 +116,19 @@ describe(filename, () => {
       try {
         const hideProc = spawn('node', [js, `--title=${title}`, '--status=2'], defaults)
 
-        hideProc.stderr.on('data', data => {
-          assert(false, data.toString())
-        })
-        // hide.stdout.on('data', data => {
-        //     console.log(data.toString());
-        // });
-        hideProc.on('exit', code => {
-          assert(!code, 'process exit without zero')
-          assert(!!user32.IsWindowVisible(hWnd), 'window should visible')
-          done()
-        })
+        if (hideProc.stderr) {
+          hideProc.stderr.on('data', data => {
+            assert(false, data.toString())
+          })
+          // hide.stdout.on('data', data => {
+          //     console.log(data.toString());
+          // });
+          hideProc.on('exit', code => {
+            assert(!code, 'process exit without zero')
+            assert(!!user32.IsWindowVisible(hWnd), 'window should visible')
+            done()
+          })
+        }
 
       }
       catch (ex) {
@@ -134,14 +139,16 @@ describe(filename, () => {
       try {
         const hideProc = spawn('node', [js, `--title=fake-${title}`, '--status=2'], defaults)
 
-        hideProc.stderr.on('data', data => {
-          assert(false, data.toString())
-        })
-        hideProc.on('exit', code => {
-          assert(!code, 'process exit without zero')
-          assert(!user32.IsWindowVisible(hWnd), 'window should still invisible')
-          done()
-        })
+        if (hideProc.stderr) {
+          hideProc.stderr.on('data', data => {
+            assert(false, data.toString())
+          })
+          hideProc.on('exit', code => {
+            assert(!code, 'process exit without zero')
+            assert(!user32.IsWindowVisible(hWnd), 'window should still invisible')
+            done()
+          })
+        }
       }
       catch (ex) {
         assert(false, ex)

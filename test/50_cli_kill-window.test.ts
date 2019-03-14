@@ -50,21 +50,22 @@ describe(filename, () => {
       try {
         const kill = spawn('node', [js, '--title=' + title], defaults)
 
-        kill.stderr.on('data', data => {
-          assert(false, data.toString())
-        })
-        kill.on('exit', code => {
-          assert(!code, 'kill process exit without zero')
-        })
+        if (kill.stderr) {
+          kill.stderr.on('data', data => {
+            assert(false, data.toString())
+          })
+          kill.on('exit', code => {
+            assert(!code, 'kill process exit without zero')
+          })
 
-        await sleep(waitTimeLong)
-        opts.matchType = 'title'
-        opts.matchValue = title
-        const arr = await nwwc.get_hwnds(opts)
-        const hWndDec = ref.address(hWnd)
+          await sleep(waitTimeLong)
+          opts.matchType = 'title'
+          opts.matchValue = title
+          const arr = await nwwc.get_hwnds(opts)
+          const hWndDec = ref.address(hWnd)
 
-        H.assert_get_hwnds(hWndDec, arr, true) // arr should empty
-
+          H.assert_get_hwnds(hWndDec, arr, true) // arr should empty
+        }
       }
       catch (ex) {
         assert(false, ex)
@@ -75,21 +76,22 @@ describe(filename, () => {
       try {
         const kill = spawn('node', [js, '--title=fake-' + title], defaults)
 
-        kill.stderr.on('data', data => {
-          assert(false, data.toString())
-        })
-        kill.on('exit', code => {
-          assert(!code, 'kill process exit without zero')
-        })
+        if (kill.stderr) {
+          kill.stderr.on('data', data => {
+            assert(false, data.toString())
+          })
+          kill.on('exit', code => {
+            assert(!code, 'kill process exit without zero')
+          })
 
-        await sleep(waitTimeLong)
-        opts.matchType = 'title'
-        opts.matchValue = title
-        const arr = await nwwc.get_hwnds(opts)
-        const hWndDec = ref.address(hWnd)
+          await sleep(waitTimeLong)
+          opts.matchType = 'title'
+          opts.matchValue = title
+          const arr = await nwwc.get_hwnds(opts)
+          const hWndDec = ref.address(hWnd)
 
-        H.assert_get_hwnds(hWndDec, arr) // arr should not empty
-
+          H.assert_get_hwnds(hWndDec, arr) // arr should not empty
+        }
       }
       catch (ex) {
         assert(false, ex)

@@ -45,16 +45,17 @@ describe(filename, () => {
       try {
         const hide = spawn('node', [js, '--title=' + title], defaults)
 
-        hide.stderr.on('data', data => {
-          assert(false, data.toString())
-        })
-        hide.on('exit', code => {
-          assert(!code, 'process exit without zero')
-        })
+        if (hide.stderr) {
+          hide.stderr.on('data', data => {
+            assert(false, data ? data.toString() : 'unknown error')
+          })
+          hide.on('exit', code => {
+            assert(!code, 'process exit without zero')
+          })
 
-        await sleep(waitTimeLong)
-        await sleep(waitTimeLong)
-        assert(!user32.IsWindowVisible(hWnd), 'window should invisible')
+          await sleep(waitTimeLong)
+          assert(!user32.IsWindowVisible(hWnd), 'window should invisible')
+        }
       }
       catch (ex) {
         assert(false, ex)
@@ -65,16 +66,17 @@ describe(filename, () => {
       try {
         const hide = spawn('node', [js, '--title=fake-' + title], defaults)
 
-        hide.stderr.on('data', data => {
-          assert(false, data.toString())
-        })
-        hide.on('exit', code => {
-          assert(!code, 'process exit without zero')
-        })
+        if (hide.stderr) {
+          hide.stderr.on('data', data => {
+            assert(false, data ? data.toString() : 'unknown error')
+          })
+          hide.on('exit', code => {
+            assert(!code, 'process exit without zero')
+          })
 
-        await sleep(waitTimeLong)
-        await sleep(waitTimeLong)
-        assert(!!user32.IsWindowVisible(hWnd), 'window should still visible')
+          await sleep(waitTimeLong)
+          assert(!!user32.IsWindowVisible(hWnd), 'window should still visible')
+        }
       }
       catch (ex) {
         assert(false, ex)
