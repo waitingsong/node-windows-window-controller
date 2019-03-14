@@ -33,10 +33,8 @@ describe(filename, () => {
       await sleep(waitTime)
       hWnd = H.find_n_check_calc_win()
     })
-    afterEach(async () => {
-      await sleep(waitTime)
+    afterEach(() => {
       child && child.kill()
-      await sleep(waitTime)
     })
 
     it('should no error', async () => {

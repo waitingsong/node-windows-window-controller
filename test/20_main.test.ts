@@ -258,10 +258,8 @@ describe(filename, () => {
       hWnd = H.find_n_check_calc_win()
       await sleep(waitTime)
     })
-    afterEach(async () => {
-      await sleep(waitTime)
+    afterEach(() => {
       child && child.kill()
-      await sleep(waitTime)
     })
 
     it('matched by pid', async () => {

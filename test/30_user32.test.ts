@@ -62,9 +62,7 @@ describe(filename, () => {
       await sleep(waitTime)
     })
     afterEach(async () => {
-      await sleep(waitTime)
       child && child.kill()
-      await sleep(waitTime)
     })
 
     it('by valid hwnd value', async () => {

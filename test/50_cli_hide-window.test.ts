@@ -37,9 +37,8 @@ describe(filename, () => {
       await sleep(waitTime)
       hWnd = H.find_n_check_calc_win()
     })
-    afterEach(async () => {
+    afterEach(() => {
       child && child.kill()
-      await sleep(waitTime)
     })
 
     it('should hidden', async () => {

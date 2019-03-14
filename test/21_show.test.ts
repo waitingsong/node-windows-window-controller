@@ -17,7 +17,7 @@ import * as H from './helper'
 const filename = basename(__filename)
 const user32 = U.load()
 const title = 'Node-Calculator'
-const waitTime = '2s'
+const waitTime = '1s'
 const UC = U.constants
 
 describe(filename, () => {
@@ -36,10 +36,8 @@ describe(filename, () => {
       await sleep(waitTime)
       assert(!user32.IsWindowVisible(hWnd), 'beforeEach: window should invisible')
     })
-    afterEach(async () => {
-      await sleep(waitTime)
+    afterEach(() => {
       child && child.kill()
-      await sleep(waitTime)
     })
 
     it('--pid', async () => {

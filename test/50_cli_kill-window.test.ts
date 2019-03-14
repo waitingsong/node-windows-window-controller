@@ -42,7 +42,7 @@ describe(filename, () => {
       hWnd = H.find_n_check_calc_win()
       assert(!!user32.IsWindowVisible(hWnd), 'beforeEach: window should visible')
     })
-    afterEach(async () => {
+    afterEach(() => {
       child && child.kill()
     })
 
