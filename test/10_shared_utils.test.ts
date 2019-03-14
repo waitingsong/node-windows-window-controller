@@ -27,7 +27,10 @@ describe(filename, () => {
     await createDir(tmpDir)
   })
   after(done => {
-    rmdir(tmpDir, err => err && console.error(err) || done())
+    rmdir(tmpDir, err => {
+      err && console.error(err)
+      done()
+    })
   })
 
 
@@ -245,7 +248,10 @@ describe(filename, () => {
 
 describe(filename + ' :isPathAcessible()', () => {
   after(done => {
-    rmdir(tmpDir, err => err && console.error(err) || done())
+    rmdir(tmpDir, err => {
+      err && console.error(err)
+      done()
+    })
   })
 
   const fnName = 'isPathAcessible'
